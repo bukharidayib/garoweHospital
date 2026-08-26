@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Menu, PhoneCall, Siren, X } from "lucide-react";
+import { ArrowUpRight, Menu, PhoneCall, Siren, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -22,41 +22,52 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50">
-      {/* Announcement / emergency bar */}
       <div className="bg-primary-deep text-primary-foreground">
-        <div className="container-page flex min-h-10 flex-wrap items-center justify-between gap-x-6 gap-y-1 py-1.5 text-xs sm:text-[13px]">
-          <p className="flex items-center gap-2">
-            <Siren className="size-4 shrink-0 text-accent" aria-hidden="true" />
-            <span>Emergency department open 24 hours, every day</span>
-          </p>
-          <p className="flex items-center gap-2 text-primary-foreground/80">
-            <PhoneCall className="size-4 shrink-0" aria-hidden="true" />
-            <span>
-              Emergency line:{" "}
-              {hospital.emergencyPhone ? (
-                <a className="font-semibold underline underline-offset-4" href={`tel:${hospital.emergencyPhone}`}>
-                  {hospital.emergencyPhone}
-                </a>
-              ) : (
-                <span className="font-medium">{CONTACT_PENDING}</span>
-              )}
+        <div className="container-page flex min-h-9 items-center justify-between gap-4 py-1.5 text-[11px] sm:text-xs">
+          <Link
+            to="/contact"
+            hash="emergency"
+            className="flex items-center gap-2 font-medium transition-colors hover:text-accent"
+          >
+            <span className="relative flex size-5 items-center justify-center">
+              <span className="absolute size-2 animate-ping rounded-full bg-accent/70" />
+              <Siren className="relative size-3.5 text-accent" aria-hidden="true" />
             </span>
+            Emergency department open 24 hours
+            <ArrowUpRight className="hidden size-3.5 sm:block" aria-hidden="true" />
+          </Link>
+          <p className="hidden items-center gap-2 text-primary-foreground/75 sm:flex">
+            <PhoneCall className="size-3.5" aria-hidden="true" />
+            <span>Emergency line:</span>
+            {hospital.emergencyPhone ? (
+              <a
+                className="font-semibold text-primary-foreground underline underline-offset-4"
+                href={`tel:${hospital.emergencyPhone}`}
+              >
+                {hospital.emergencyPhone}
+              </a>
+            ) : (
+              <span className="font-medium">{CONTACT_PENDING}</span>
+            )}
           </p>
         </div>
       </div>
 
-      <div className="border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-        <div className="container-page flex h-18 items-center justify-between gap-4 py-3">
+      <div className="border-b border-border/80 bg-background/95 shadow-[0_4px_20px_-18px_var(--color-primary-deep)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="container-page flex min-h-[4.75rem] items-center justify-between gap-4 py-3">
           <Logo />
 
-          <nav aria-label="Main navigation" className="hidden items-center gap-1 xl:flex">
+          <nav aria-label="Main navigation" className="hidden items-center gap-0.5 xl:flex">
             {nav.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 activeOptions={{ exact: item.to === "/" }}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                activeProps={{ className: "bg-secondary text-primary" }}
+                className="rounded-lg px-3 py-2 text-[13px] font-semibold text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                activeProps={{
+                  className:
+                    "rounded-lg bg-primary-soft px-3 py-2 text-[13px] font-semibold text-primary",
+                }}
               >
                 {item.label}
               </Link>
@@ -67,16 +78,23 @@ export function SiteHeader() {
             <Button asChild variant="emergency" size="sm" className="hidden sm:inline-flex">
               <Link to="/contact" hash="emergency">
                 <Siren />
-                Emergency
+                <span className="hidden 2xl:inline">Emergency</span>
               </Link>
             </Button>
-            <Button asChild size="sm" className="hidden sm:inline-flex">
-              <Link to="/appointments">Book Appointment</Link>
+            <Button asChild size="sm" className="hidden md:inline-flex">
+              <Link to="/appointments">
+                Book Appointment <ArrowUpRight />
+              </Link>
             </Button>
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="min-h-11 min-w-11 xl:hidden" aria-label="Open menu">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="min-h-11 min-w-11 xl:hidden"
+                  aria-label="Open menu"
+                >
                   <Menu />
                 </Button>
               </SheetTrigger>

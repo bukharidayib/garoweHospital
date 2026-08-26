@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AppointmentsRouteImport } from './routes/appointments'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as DoctorsRouteImport } from './routes/doctors'
@@ -18,9 +19,53 @@ import { Route as PatientsVisitorsRouteImport } from './routes/patients-visitors
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as AdminAdmissionsRouteImport } from './routes/admin.admissions'
+import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
+import { Route as AdminAuditLogsRouteImport } from './routes/admin.audit-logs'
+import { Route as AdminBedBoardRouteImport } from './routes/admin.bed-board'
+import { Route as AdminBillingRouteImport } from './routes/admin.billing'
+import { Route as AdminClinicalRouteImport } from './routes/admin.clinical'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminDischargesRouteImport } from './routes/admin.discharges'
+import { Route as AdminForgotPasswordRouteImport } from './routes/admin.forgot-password'
+import { Route as AdminLaboratoryRouteImport } from './routes/admin.laboratory'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminPatientsRouteImport } from './routes/admin.patients'
+import { Route as AdminPharmacyRouteImport } from './routes/admin.pharmacy'
+import { Route as AdminPrescriptionsRouteImport } from './routes/admin.prescriptions'
+import { Route as AdminQueueRouteImport } from './routes/admin.queue'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as AdminWardsRouteImport } from './routes/admin.wards'
 import { Route as DepartmentsSlugRouteImport } from './routes/departments.$slug'
 import { Route as DoctorsSlugRouteImport } from './routes/doctors.$slug'
 import { Route as ServicesSlugRouteImport } from './routes/services.$slug'
+import { Route as AdminAdmissionsAdmissionIdRouteImport } from './routes/admin.admissions.$admissionId'
+import { Route as AdminAppointmentsAppointmentIdRouteImport } from './routes/admin.appointments.$appointmentId'
+import { Route as AdminAppointmentsNewRouteImport } from './routes/admin.appointments.new'
+import { Route as AdminBillingInvoicesRouteImport } from './routes/admin.billing.invoices'
+import { Route as AdminBillingOutstandingRouteImport } from './routes/admin.billing.outstanding'
+import { Route as AdminBillingPaymentsRouteImport } from './routes/admin.billing.payments'
+import { Route as AdminBillingReceiptsRouteImport } from './routes/admin.billing.receipts'
+import { Route as AdminBillingServicesRouteImport } from './routes/admin.billing.services'
+import { Route as AdminLaboratoryCatalogRouteImport } from './routes/admin.laboratory.catalog'
+import { Route as AdminLaboratoryNewRouteImport } from './routes/admin.laboratory.new'
+import { Route as AdminPatientsPatientIdRouteImport } from './routes/admin.patients.$patientId'
+import { Route as AdminPatientsNewRouteImport } from './routes/admin.patients.new'
+import { Route as AdminPharmacyExpiryRouteImport } from './routes/admin.pharmacy.expiry'
+import { Route as AdminPharmacyInventoryRouteImport } from './routes/admin.pharmacy.inventory'
+import { Route as AdminPharmacyLowStockRouteImport } from './routes/admin.pharmacy.low-stock'
+import { Route as AdminPharmacyMedicinesRouteImport } from './routes/admin.pharmacy.medicines'
+import { Route as AdminPharmacyMovementsRouteImport } from './routes/admin.pharmacy.movements'
+import { Route as AdminPharmacyPosRouteImport } from './routes/admin.pharmacy.pos'
+import { Route as AdminReportsCategoryRouteImport } from './routes/admin.reports.$category'
+import { Route as AdminWardsWardIdRouteImport } from './routes/admin.wards.$wardId'
+import { Route as AdminBillingInvoicesInvoiceIdRouteImport } from './routes/admin.billing.invoices.$invoiceId'
+import { Route as AdminBillingInvoicesNewRouteImport } from './routes/admin.billing.invoices.new'
+import { Route as AdminLaboratoryOrdersOrderIdRouteImport } from './routes/admin.laboratory.orders.$orderId'
+import { Route as AdminPatientsPatientIdEditRouteImport } from './routes/admin.patients.$patientId.edit'
+import { Route as AdminPharmacyPrescriptionsPrescriptionIdRouteImport } from './routes/admin.pharmacy.prescriptions.$prescriptionId'
+import { Route as AdminClinicalVisitsVisitIdConsultationRouteImport } from './routes/admin.clinical.visits.$visitId.consultation'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -30,6 +75,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppointmentsRoute = AppointmentsRouteImport.update({
+  id: '/appointments',
+  path: '/appointments',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -67,6 +117,96 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAdmissionsRoute = AdminAdmissionsRouteImport.update({
+  id: '/admin/admissions',
+  path: '/admin/admissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAppointmentsRoute = AdminAppointmentsRouteImport.update({
+  id: '/admin/appointments',
+  path: '/admin/appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditLogsRoute = AdminAuditLogsRouteImport.update({
+  id: '/admin/audit-logs',
+  path: '/admin/audit-logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBedBoardRoute = AdminBedBoardRouteImport.update({
+  id: '/admin/bed-board',
+  path: '/admin/bed-board',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBillingRoute = AdminBillingRouteImport.update({
+  id: '/admin/billing',
+  path: '/admin/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminClinicalRoute = AdminClinicalRouteImport.update({
+  id: '/admin/clinical',
+  path: '/admin/clinical',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDischargesRoute = AdminDischargesRouteImport.update({
+  id: '/admin/discharges',
+  path: '/admin/discharges',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminForgotPasswordRoute = AdminForgotPasswordRouteImport.update({
+  id: '/admin/forgot-password',
+  path: '/admin/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLaboratoryRoute = AdminLaboratoryRouteImport.update({
+  id: '/admin/laboratory',
+  path: '/admin/laboratory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPatientsRoute = AdminPatientsRouteImport.update({
+  id: '/admin/patients',
+  path: '/admin/patients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPharmacyRoute = AdminPharmacyRouteImport.update({
+  id: '/admin/pharmacy',
+  path: '/admin/pharmacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPrescriptionsRoute = AdminPrescriptionsRouteImport.update({
+  id: '/admin/prescriptions',
+  path: '/admin/prescriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQueueRoute = AdminQueueRouteImport.update({
+  id: '/admin/queue',
+  path: '/admin/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/admin/reports',
+  path: '/admin/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminWardsRoute = AdminWardsRouteImport.update({
+  id: '/admin/wards',
+  path: '/admin/wards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DepartmentsSlugRoute = DepartmentsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -82,10 +222,148 @@ const ServicesSlugRoute = ServicesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ServicesRoute,
 } as any)
+const AdminAdmissionsAdmissionIdRoute =
+  AdminAdmissionsAdmissionIdRouteImport.update({
+    id: '/$admissionId',
+    path: '/$admissionId',
+    getParentRoute: () => AdminAdmissionsRoute,
+  } as any)
+const AdminAppointmentsAppointmentIdRoute =
+  AdminAppointmentsAppointmentIdRouteImport.update({
+    id: '/$appointmentId',
+    path: '/$appointmentId',
+    getParentRoute: () => AdminAppointmentsRoute,
+  } as any)
+const AdminAppointmentsNewRoute = AdminAppointmentsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminAppointmentsRoute,
+} as any)
+const AdminBillingInvoicesRoute = AdminBillingInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => AdminBillingRoute,
+} as any)
+const AdminBillingOutstandingRoute = AdminBillingOutstandingRouteImport.update({
+  id: '/outstanding',
+  path: '/outstanding',
+  getParentRoute: () => AdminBillingRoute,
+} as any)
+const AdminBillingPaymentsRoute = AdminBillingPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminBillingRoute,
+} as any)
+const AdminBillingReceiptsRoute = AdminBillingReceiptsRouteImport.update({
+  id: '/receipts',
+  path: '/receipts',
+  getParentRoute: () => AdminBillingRoute,
+} as any)
+const AdminBillingServicesRoute = AdminBillingServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => AdminBillingRoute,
+} as any)
+const AdminLaboratoryCatalogRoute = AdminLaboratoryCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AdminLaboratoryRoute,
+} as any)
+const AdminLaboratoryNewRoute = AdminLaboratoryNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminLaboratoryRoute,
+} as any)
+const AdminPatientsPatientIdRoute = AdminPatientsPatientIdRouteImport.update({
+  id: '/$patientId',
+  path: '/$patientId',
+  getParentRoute: () => AdminPatientsRoute,
+} as any)
+const AdminPatientsNewRoute = AdminPatientsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminPatientsRoute,
+} as any)
+const AdminPharmacyExpiryRoute = AdminPharmacyExpiryRouteImport.update({
+  id: '/expiry',
+  path: '/expiry',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminPharmacyInventoryRoute = AdminPharmacyInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminPharmacyLowStockRoute = AdminPharmacyLowStockRouteImport.update({
+  id: '/low-stock',
+  path: '/low-stock',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminPharmacyMedicinesRoute = AdminPharmacyMedicinesRouteImport.update({
+  id: '/medicines',
+  path: '/medicines',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminPharmacyMovementsRoute = AdminPharmacyMovementsRouteImport.update({
+  id: '/movements',
+  path: '/movements',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminPharmacyPosRoute = AdminPharmacyPosRouteImport.update({
+  id: '/pos',
+  path: '/pos',
+  getParentRoute: () => AdminPharmacyRoute,
+} as any)
+const AdminReportsCategoryRoute = AdminReportsCategoryRouteImport.update({
+  id: '/$category',
+  path: '/$category',
+  getParentRoute: () => AdminReportsRoute,
+} as any)
+const AdminWardsWardIdRoute = AdminWardsWardIdRouteImport.update({
+  id: '/$wardId',
+  path: '/$wardId',
+  getParentRoute: () => AdminWardsRoute,
+} as any)
+const AdminBillingInvoicesInvoiceIdRoute =
+  AdminBillingInvoicesInvoiceIdRouteImport.update({
+    id: '/$invoiceId',
+    path: '/$invoiceId',
+    getParentRoute: () => AdminBillingInvoicesRoute,
+  } as any)
+const AdminBillingInvoicesNewRoute = AdminBillingInvoicesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminBillingInvoicesRoute,
+} as any)
+const AdminLaboratoryOrdersOrderIdRoute =
+  AdminLaboratoryOrdersOrderIdRouteImport.update({
+    id: '/orders/$orderId',
+    path: '/orders/$orderId',
+    getParentRoute: () => AdminLaboratoryRoute,
+  } as any)
+const AdminPatientsPatientIdEditRoute =
+  AdminPatientsPatientIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AdminPatientsPatientIdRoute,
+  } as any)
+const AdminPharmacyPrescriptionsPrescriptionIdRoute =
+  AdminPharmacyPrescriptionsPrescriptionIdRouteImport.update({
+    id: '/prescriptions/$prescriptionId',
+    path: '/prescriptions/$prescriptionId',
+    getParentRoute: () => AdminPharmacyRoute,
+  } as any)
+const AdminClinicalVisitsVisitIdConsultationRoute =
+  AdminClinicalVisitsVisitIdConsultationRouteImport.update({
+    id: '/visits/$visitId/consultation',
+    path: '/visits/$visitId/consultation',
+    getParentRoute: () => AdminClinicalRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/appointments': typeof AppointmentsRoute
   '/contact': typeof ContactRoute
   '/departments': typeof DepartmentsRouteWithChildren
   '/doctors': typeof DoctorsRouteWithChildren
@@ -93,13 +371,58 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRouteWithChildren
   '/terms': typeof TermsRoute
+  '/admin/admissions': typeof AdminAdmissionsRouteWithChildren
+  '/admin/appointments': typeof AdminAppointmentsRouteWithChildren
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/bed-board': typeof AdminBedBoardRoute
+  '/admin/billing': typeof AdminBillingRouteWithChildren
+  '/admin/clinical': typeof AdminClinicalRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/discharges': typeof AdminDischargesRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/laboratory': typeof AdminLaboratoryRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/patients': typeof AdminPatientsRouteWithChildren
+  '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/queue': typeof AdminQueueRoute
+  '/admin/reports': typeof AdminReportsRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/wards': typeof AdminWardsRouteWithChildren
   '/departments/$slug': typeof DepartmentsSlugRoute
   '/doctors/$slug': typeof DoctorsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin/admissions/$admissionId': typeof AdminAdmissionsAdmissionIdRoute
+  '/admin/appointments/$appointmentId': typeof AdminAppointmentsAppointmentIdRoute
+  '/admin/appointments/new': typeof AdminAppointmentsNewRoute
+  '/admin/billing/invoices': typeof AdminBillingInvoicesRouteWithChildren
+  '/admin/billing/outstanding': typeof AdminBillingOutstandingRoute
+  '/admin/billing/payments': typeof AdminBillingPaymentsRoute
+  '/admin/billing/receipts': typeof AdminBillingReceiptsRoute
+  '/admin/billing/services': typeof AdminBillingServicesRoute
+  '/admin/laboratory/catalog': typeof AdminLaboratoryCatalogRoute
+  '/admin/laboratory/new': typeof AdminLaboratoryNewRoute
+  '/admin/patients/$patientId': typeof AdminPatientsPatientIdRouteWithChildren
+  '/admin/patients/new': typeof AdminPatientsNewRoute
+  '/admin/pharmacy/expiry': typeof AdminPharmacyExpiryRoute
+  '/admin/pharmacy/inventory': typeof AdminPharmacyInventoryRoute
+  '/admin/pharmacy/low-stock': typeof AdminPharmacyLowStockRoute
+  '/admin/pharmacy/medicines': typeof AdminPharmacyMedicinesRoute
+  '/admin/pharmacy/movements': typeof AdminPharmacyMovementsRoute
+  '/admin/pharmacy/pos': typeof AdminPharmacyPosRoute
+  '/admin/reports/$category': typeof AdminReportsCategoryRoute
+  '/admin/wards/$wardId': typeof AdminWardsWardIdRoute
+  '/admin/billing/invoices/$invoiceId': typeof AdminBillingInvoicesInvoiceIdRoute
+  '/admin/billing/invoices/new': typeof AdminBillingInvoicesNewRoute
+  '/admin/laboratory/orders/$orderId': typeof AdminLaboratoryOrdersOrderIdRoute
+  '/admin/patients/$patientId/edit': typeof AdminPatientsPatientIdEditRoute
+  '/admin/pharmacy/prescriptions/$prescriptionId': typeof AdminPharmacyPrescriptionsPrescriptionIdRoute
+  '/admin/clinical/visits/$visitId/consultation': typeof AdminClinicalVisitsVisitIdConsultationRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/appointments': typeof AppointmentsRoute
   '/contact': typeof ContactRoute
   '/departments': typeof DepartmentsRouteWithChildren
   '/doctors': typeof DoctorsRouteWithChildren
@@ -107,14 +430,59 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRouteWithChildren
   '/terms': typeof TermsRoute
+  '/admin/admissions': typeof AdminAdmissionsRouteWithChildren
+  '/admin/appointments': typeof AdminAppointmentsRouteWithChildren
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/bed-board': typeof AdminBedBoardRoute
+  '/admin/billing': typeof AdminBillingRouteWithChildren
+  '/admin/clinical': typeof AdminClinicalRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/discharges': typeof AdminDischargesRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/laboratory': typeof AdminLaboratoryRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/patients': typeof AdminPatientsRouteWithChildren
+  '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/queue': typeof AdminQueueRoute
+  '/admin/reports': typeof AdminReportsRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/wards': typeof AdminWardsRouteWithChildren
   '/departments/$slug': typeof DepartmentsSlugRoute
   '/doctors/$slug': typeof DoctorsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin/admissions/$admissionId': typeof AdminAdmissionsAdmissionIdRoute
+  '/admin/appointments/$appointmentId': typeof AdminAppointmentsAppointmentIdRoute
+  '/admin/appointments/new': typeof AdminAppointmentsNewRoute
+  '/admin/billing/invoices': typeof AdminBillingInvoicesRouteWithChildren
+  '/admin/billing/outstanding': typeof AdminBillingOutstandingRoute
+  '/admin/billing/payments': typeof AdminBillingPaymentsRoute
+  '/admin/billing/receipts': typeof AdminBillingReceiptsRoute
+  '/admin/billing/services': typeof AdminBillingServicesRoute
+  '/admin/laboratory/catalog': typeof AdminLaboratoryCatalogRoute
+  '/admin/laboratory/new': typeof AdminLaboratoryNewRoute
+  '/admin/patients/$patientId': typeof AdminPatientsPatientIdRouteWithChildren
+  '/admin/patients/new': typeof AdminPatientsNewRoute
+  '/admin/pharmacy/expiry': typeof AdminPharmacyExpiryRoute
+  '/admin/pharmacy/inventory': typeof AdminPharmacyInventoryRoute
+  '/admin/pharmacy/low-stock': typeof AdminPharmacyLowStockRoute
+  '/admin/pharmacy/medicines': typeof AdminPharmacyMedicinesRoute
+  '/admin/pharmacy/movements': typeof AdminPharmacyMovementsRoute
+  '/admin/pharmacy/pos': typeof AdminPharmacyPosRoute
+  '/admin/reports/$category': typeof AdminReportsCategoryRoute
+  '/admin/wards/$wardId': typeof AdminWardsWardIdRoute
+  '/admin/billing/invoices/$invoiceId': typeof AdminBillingInvoicesInvoiceIdRoute
+  '/admin/billing/invoices/new': typeof AdminBillingInvoicesNewRoute
+  '/admin/laboratory/orders/$orderId': typeof AdminLaboratoryOrdersOrderIdRoute
+  '/admin/patients/$patientId/edit': typeof AdminPatientsPatientIdEditRoute
+  '/admin/pharmacy/prescriptions/$prescriptionId': typeof AdminPharmacyPrescriptionsPrescriptionIdRoute
+  '/admin/clinical/visits/$visitId/consultation': typeof AdminClinicalVisitsVisitIdConsultationRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/appointments': typeof AppointmentsRoute
   '/contact': typeof ContactRoute
   '/departments': typeof DepartmentsRouteWithChildren
   '/doctors': typeof DoctorsRouteWithChildren
@@ -122,15 +490,60 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/services': typeof ServicesRouteWithChildren
   '/terms': typeof TermsRoute
+  '/admin/admissions': typeof AdminAdmissionsRouteWithChildren
+  '/admin/appointments': typeof AdminAppointmentsRouteWithChildren
+  '/admin/audit-logs': typeof AdminAuditLogsRoute
+  '/admin/bed-board': typeof AdminBedBoardRoute
+  '/admin/billing': typeof AdminBillingRouteWithChildren
+  '/admin/clinical': typeof AdminClinicalRouteWithChildren
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/discharges': typeof AdminDischargesRoute
+  '/admin/forgot-password': typeof AdminForgotPasswordRoute
+  '/admin/laboratory': typeof AdminLaboratoryRouteWithChildren
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/patients': typeof AdminPatientsRouteWithChildren
+  '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
+  '/admin/prescriptions': typeof AdminPrescriptionsRoute
+  '/admin/queue': typeof AdminQueueRoute
+  '/admin/reports': typeof AdminReportsRouteWithChildren
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/wards': typeof AdminWardsRouteWithChildren
   '/departments/$slug': typeof DepartmentsSlugRoute
   '/doctors/$slug': typeof DoctorsSlugRoute
   '/services/$slug': typeof ServicesSlugRoute
+  '/admin/admissions/$admissionId': typeof AdminAdmissionsAdmissionIdRoute
+  '/admin/appointments/$appointmentId': typeof AdminAppointmentsAppointmentIdRoute
+  '/admin/appointments/new': typeof AdminAppointmentsNewRoute
+  '/admin/billing/invoices': typeof AdminBillingInvoicesRouteWithChildren
+  '/admin/billing/outstanding': typeof AdminBillingOutstandingRoute
+  '/admin/billing/payments': typeof AdminBillingPaymentsRoute
+  '/admin/billing/receipts': typeof AdminBillingReceiptsRoute
+  '/admin/billing/services': typeof AdminBillingServicesRoute
+  '/admin/laboratory/catalog': typeof AdminLaboratoryCatalogRoute
+  '/admin/laboratory/new': typeof AdminLaboratoryNewRoute
+  '/admin/patients/$patientId': typeof AdminPatientsPatientIdRouteWithChildren
+  '/admin/patients/new': typeof AdminPatientsNewRoute
+  '/admin/pharmacy/expiry': typeof AdminPharmacyExpiryRoute
+  '/admin/pharmacy/inventory': typeof AdminPharmacyInventoryRoute
+  '/admin/pharmacy/low-stock': typeof AdminPharmacyLowStockRoute
+  '/admin/pharmacy/medicines': typeof AdminPharmacyMedicinesRoute
+  '/admin/pharmacy/movements': typeof AdminPharmacyMovementsRoute
+  '/admin/pharmacy/pos': typeof AdminPharmacyPosRoute
+  '/admin/reports/$category': typeof AdminReportsCategoryRoute
+  '/admin/wards/$wardId': typeof AdminWardsWardIdRoute
+  '/admin/billing/invoices/$invoiceId': typeof AdminBillingInvoicesInvoiceIdRoute
+  '/admin/billing/invoices/new': typeof AdminBillingInvoicesNewRoute
+  '/admin/laboratory/orders/$orderId': typeof AdminLaboratoryOrdersOrderIdRoute
+  '/admin/patients/$patientId/edit': typeof AdminPatientsPatientIdEditRoute
+  '/admin/pharmacy/prescriptions/$prescriptionId': typeof AdminPharmacyPrescriptionsPrescriptionIdRoute
+  '/admin/clinical/visits/$visitId/consultation': typeof AdminClinicalVisitsVisitIdConsultationRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/appointments'
     | '/contact'
     | '/departments'
     | '/doctors'
@@ -138,13 +551,58 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/terms'
+    | '/admin/admissions'
+    | '/admin/appointments'
+    | '/admin/audit-logs'
+    | '/admin/bed-board'
+    | '/admin/billing'
+    | '/admin/clinical'
+    | '/admin/dashboard'
+    | '/admin/discharges'
+    | '/admin/forgot-password'
+    | '/admin/laboratory'
+    | '/admin/login'
+    | '/admin/patients'
+    | '/admin/pharmacy'
+    | '/admin/prescriptions'
+    | '/admin/queue'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/wards'
     | '/departments/$slug'
     | '/doctors/$slug'
     | '/services/$slug'
+    | '/admin/admissions/$admissionId'
+    | '/admin/appointments/$appointmentId'
+    | '/admin/appointments/new'
+    | '/admin/billing/invoices'
+    | '/admin/billing/outstanding'
+    | '/admin/billing/payments'
+    | '/admin/billing/receipts'
+    | '/admin/billing/services'
+    | '/admin/laboratory/catalog'
+    | '/admin/laboratory/new'
+    | '/admin/patients/$patientId'
+    | '/admin/patients/new'
+    | '/admin/pharmacy/expiry'
+    | '/admin/pharmacy/inventory'
+    | '/admin/pharmacy/low-stock'
+    | '/admin/pharmacy/medicines'
+    | '/admin/pharmacy/movements'
+    | '/admin/pharmacy/pos'
+    | '/admin/reports/$category'
+    | '/admin/wards/$wardId'
+    | '/admin/billing/invoices/$invoiceId'
+    | '/admin/billing/invoices/new'
+    | '/admin/laboratory/orders/$orderId'
+    | '/admin/patients/$patientId/edit'
+    | '/admin/pharmacy/prescriptions/$prescriptionId'
+    | '/admin/clinical/visits/$visitId/consultation'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/appointments'
     | '/contact'
     | '/departments'
     | '/doctors'
@@ -152,13 +610,58 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/terms'
+    | '/admin/admissions'
+    | '/admin/appointments'
+    | '/admin/audit-logs'
+    | '/admin/bed-board'
+    | '/admin/billing'
+    | '/admin/clinical'
+    | '/admin/dashboard'
+    | '/admin/discharges'
+    | '/admin/forgot-password'
+    | '/admin/laboratory'
+    | '/admin/login'
+    | '/admin/patients'
+    | '/admin/pharmacy'
+    | '/admin/prescriptions'
+    | '/admin/queue'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/wards'
     | '/departments/$slug'
     | '/doctors/$slug'
     | '/services/$slug'
+    | '/admin/admissions/$admissionId'
+    | '/admin/appointments/$appointmentId'
+    | '/admin/appointments/new'
+    | '/admin/billing/invoices'
+    | '/admin/billing/outstanding'
+    | '/admin/billing/payments'
+    | '/admin/billing/receipts'
+    | '/admin/billing/services'
+    | '/admin/laboratory/catalog'
+    | '/admin/laboratory/new'
+    | '/admin/patients/$patientId'
+    | '/admin/patients/new'
+    | '/admin/pharmacy/expiry'
+    | '/admin/pharmacy/inventory'
+    | '/admin/pharmacy/low-stock'
+    | '/admin/pharmacy/medicines'
+    | '/admin/pharmacy/movements'
+    | '/admin/pharmacy/pos'
+    | '/admin/reports/$category'
+    | '/admin/wards/$wardId'
+    | '/admin/billing/invoices/$invoiceId'
+    | '/admin/billing/invoices/new'
+    | '/admin/laboratory/orders/$orderId'
+    | '/admin/patients/$patientId/edit'
+    | '/admin/pharmacy/prescriptions/$prescriptionId'
+    | '/admin/clinical/visits/$visitId/consultation'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/appointments'
     | '/contact'
     | '/departments'
     | '/doctors'
@@ -166,14 +669,59 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/services'
     | '/terms'
+    | '/admin/admissions'
+    | '/admin/appointments'
+    | '/admin/audit-logs'
+    | '/admin/bed-board'
+    | '/admin/billing'
+    | '/admin/clinical'
+    | '/admin/dashboard'
+    | '/admin/discharges'
+    | '/admin/forgot-password'
+    | '/admin/laboratory'
+    | '/admin/login'
+    | '/admin/patients'
+    | '/admin/pharmacy'
+    | '/admin/prescriptions'
+    | '/admin/queue'
+    | '/admin/reports'
+    | '/admin/settings'
+    | '/admin/wards'
     | '/departments/$slug'
     | '/doctors/$slug'
     | '/services/$slug'
+    | '/admin/admissions/$admissionId'
+    | '/admin/appointments/$appointmentId'
+    | '/admin/appointments/new'
+    | '/admin/billing/invoices'
+    | '/admin/billing/outstanding'
+    | '/admin/billing/payments'
+    | '/admin/billing/receipts'
+    | '/admin/billing/services'
+    | '/admin/laboratory/catalog'
+    | '/admin/laboratory/new'
+    | '/admin/patients/$patientId'
+    | '/admin/patients/new'
+    | '/admin/pharmacy/expiry'
+    | '/admin/pharmacy/inventory'
+    | '/admin/pharmacy/low-stock'
+    | '/admin/pharmacy/medicines'
+    | '/admin/pharmacy/movements'
+    | '/admin/pharmacy/pos'
+    | '/admin/reports/$category'
+    | '/admin/wards/$wardId'
+    | '/admin/billing/invoices/$invoiceId'
+    | '/admin/billing/invoices/new'
+    | '/admin/laboratory/orders/$orderId'
+    | '/admin/patients/$patientId/edit'
+    | '/admin/pharmacy/prescriptions/$prescriptionId'
+    | '/admin/clinical/visits/$visitId/consultation'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AppointmentsRoute: typeof AppointmentsRoute
   ContactRoute: typeof ContactRoute
   DepartmentsRoute: typeof DepartmentsRouteWithChildren
   DoctorsRoute: typeof DoctorsRouteWithChildren
@@ -181,6 +729,24 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ServicesRoute: typeof ServicesRouteWithChildren
   TermsRoute: typeof TermsRoute
+  AdminAdmissionsRoute: typeof AdminAdmissionsRouteWithChildren
+  AdminAppointmentsRoute: typeof AdminAppointmentsRouteWithChildren
+  AdminAuditLogsRoute: typeof AdminAuditLogsRoute
+  AdminBedBoardRoute: typeof AdminBedBoardRoute
+  AdminBillingRoute: typeof AdminBillingRouteWithChildren
+  AdminClinicalRoute: typeof AdminClinicalRouteWithChildren
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDischargesRoute: typeof AdminDischargesRoute
+  AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
+  AdminLaboratoryRoute: typeof AdminLaboratoryRouteWithChildren
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminPatientsRoute: typeof AdminPatientsRouteWithChildren
+  AdminPharmacyRoute: typeof AdminPharmacyRouteWithChildren
+  AdminPrescriptionsRoute: typeof AdminPrescriptionsRoute
+  AdminQueueRoute: typeof AdminQueueRoute
+  AdminReportsRoute: typeof AdminReportsRouteWithChildren
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminWardsRoute: typeof AdminWardsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +763,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/appointments': {
+      id: '/appointments'
+      path: '/appointments'
+      fullPath: '/appointments'
+      preLoaderRoute: typeof AppointmentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -248,6 +821,132 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/admissions': {
+      id: '/admin/admissions'
+      path: '/admin/admissions'
+      fullPath: '/admin/admissions'
+      preLoaderRoute: typeof AdminAdmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/appointments': {
+      id: '/admin/appointments'
+      path: '/admin/appointments'
+      fullPath: '/admin/appointments'
+      preLoaderRoute: typeof AdminAppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit-logs': {
+      id: '/admin/audit-logs'
+      path: '/admin/audit-logs'
+      fullPath: '/admin/audit-logs'
+      preLoaderRoute: typeof AdminAuditLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/bed-board': {
+      id: '/admin/bed-board'
+      path: '/admin/bed-board'
+      fullPath: '/admin/bed-board'
+      preLoaderRoute: typeof AdminBedBoardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/billing': {
+      id: '/admin/billing'
+      path: '/admin/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AdminBillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/clinical': {
+      id: '/admin/clinical'
+      path: '/admin/clinical'
+      fullPath: '/admin/clinical'
+      preLoaderRoute: typeof AdminClinicalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/discharges': {
+      id: '/admin/discharges'
+      path: '/admin/discharges'
+      fullPath: '/admin/discharges'
+      preLoaderRoute: typeof AdminDischargesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/forgot-password': {
+      id: '/admin/forgot-password'
+      path: '/admin/forgot-password'
+      fullPath: '/admin/forgot-password'
+      preLoaderRoute: typeof AdminForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/laboratory': {
+      id: '/admin/laboratory'
+      path: '/admin/laboratory'
+      fullPath: '/admin/laboratory'
+      preLoaderRoute: typeof AdminLaboratoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/patients': {
+      id: '/admin/patients'
+      path: '/admin/patients'
+      fullPath: '/admin/patients'
+      preLoaderRoute: typeof AdminPatientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/pharmacy': {
+      id: '/admin/pharmacy'
+      path: '/admin/pharmacy'
+      fullPath: '/admin/pharmacy'
+      preLoaderRoute: typeof AdminPharmacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/prescriptions': {
+      id: '/admin/prescriptions'
+      path: '/admin/prescriptions'
+      fullPath: '/admin/prescriptions'
+      preLoaderRoute: typeof AdminPrescriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/queue': {
+      id: '/admin/queue'
+      path: '/admin/queue'
+      fullPath: '/admin/queue'
+      preLoaderRoute: typeof AdminQueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/admin/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/wards': {
+      id: '/admin/wards'
+      path: '/admin/wards'
+      fullPath: '/admin/wards'
+      preLoaderRoute: typeof AdminWardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/departments/$slug': {
       id: '/departments/$slug'
       path: '/$slug'
@@ -268,6 +967,188 @@ declare module '@tanstack/react-router' {
       fullPath: '/services/$slug'
       preLoaderRoute: typeof ServicesSlugRouteImport
       parentRoute: typeof ServicesRoute
+    }
+    '/admin/admissions/$admissionId': {
+      id: '/admin/admissions/$admissionId'
+      path: '/$admissionId'
+      fullPath: '/admin/admissions/$admissionId'
+      preLoaderRoute: typeof AdminAdmissionsAdmissionIdRouteImport
+      parentRoute: typeof AdminAdmissionsRoute
+    }
+    '/admin/appointments/$appointmentId': {
+      id: '/admin/appointments/$appointmentId'
+      path: '/$appointmentId'
+      fullPath: '/admin/appointments/$appointmentId'
+      preLoaderRoute: typeof AdminAppointmentsAppointmentIdRouteImport
+      parentRoute: typeof AdminAppointmentsRoute
+    }
+    '/admin/appointments/new': {
+      id: '/admin/appointments/new'
+      path: '/new'
+      fullPath: '/admin/appointments/new'
+      preLoaderRoute: typeof AdminAppointmentsNewRouteImport
+      parentRoute: typeof AdminAppointmentsRoute
+    }
+    '/admin/billing/invoices': {
+      id: '/admin/billing/invoices'
+      path: '/invoices'
+      fullPath: '/admin/billing/invoices'
+      preLoaderRoute: typeof AdminBillingInvoicesRouteImport
+      parentRoute: typeof AdminBillingRoute
+    }
+    '/admin/billing/outstanding': {
+      id: '/admin/billing/outstanding'
+      path: '/outstanding'
+      fullPath: '/admin/billing/outstanding'
+      preLoaderRoute: typeof AdminBillingOutstandingRouteImport
+      parentRoute: typeof AdminBillingRoute
+    }
+    '/admin/billing/payments': {
+      id: '/admin/billing/payments'
+      path: '/payments'
+      fullPath: '/admin/billing/payments'
+      preLoaderRoute: typeof AdminBillingPaymentsRouteImport
+      parentRoute: typeof AdminBillingRoute
+    }
+    '/admin/billing/receipts': {
+      id: '/admin/billing/receipts'
+      path: '/receipts'
+      fullPath: '/admin/billing/receipts'
+      preLoaderRoute: typeof AdminBillingReceiptsRouteImport
+      parentRoute: typeof AdminBillingRoute
+    }
+    '/admin/billing/services': {
+      id: '/admin/billing/services'
+      path: '/services'
+      fullPath: '/admin/billing/services'
+      preLoaderRoute: typeof AdminBillingServicesRouteImport
+      parentRoute: typeof AdminBillingRoute
+    }
+    '/admin/laboratory/catalog': {
+      id: '/admin/laboratory/catalog'
+      path: '/catalog'
+      fullPath: '/admin/laboratory/catalog'
+      preLoaderRoute: typeof AdminLaboratoryCatalogRouteImport
+      parentRoute: typeof AdminLaboratoryRoute
+    }
+    '/admin/laboratory/new': {
+      id: '/admin/laboratory/new'
+      path: '/new'
+      fullPath: '/admin/laboratory/new'
+      preLoaderRoute: typeof AdminLaboratoryNewRouteImport
+      parentRoute: typeof AdminLaboratoryRoute
+    }
+    '/admin/patients/$patientId': {
+      id: '/admin/patients/$patientId'
+      path: '/$patientId'
+      fullPath: '/admin/patients/$patientId'
+      preLoaderRoute: typeof AdminPatientsPatientIdRouteImport
+      parentRoute: typeof AdminPatientsRoute
+    }
+    '/admin/patients/new': {
+      id: '/admin/patients/new'
+      path: '/new'
+      fullPath: '/admin/patients/new'
+      preLoaderRoute: typeof AdminPatientsNewRouteImport
+      parentRoute: typeof AdminPatientsRoute
+    }
+    '/admin/pharmacy/expiry': {
+      id: '/admin/pharmacy/expiry'
+      path: '/expiry'
+      fullPath: '/admin/pharmacy/expiry'
+      preLoaderRoute: typeof AdminPharmacyExpiryRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/pharmacy/inventory': {
+      id: '/admin/pharmacy/inventory'
+      path: '/inventory'
+      fullPath: '/admin/pharmacy/inventory'
+      preLoaderRoute: typeof AdminPharmacyInventoryRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/pharmacy/low-stock': {
+      id: '/admin/pharmacy/low-stock'
+      path: '/low-stock'
+      fullPath: '/admin/pharmacy/low-stock'
+      preLoaderRoute: typeof AdminPharmacyLowStockRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/pharmacy/medicines': {
+      id: '/admin/pharmacy/medicines'
+      path: '/medicines'
+      fullPath: '/admin/pharmacy/medicines'
+      preLoaderRoute: typeof AdminPharmacyMedicinesRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/pharmacy/movements': {
+      id: '/admin/pharmacy/movements'
+      path: '/movements'
+      fullPath: '/admin/pharmacy/movements'
+      preLoaderRoute: typeof AdminPharmacyMovementsRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/pharmacy/pos': {
+      id: '/admin/pharmacy/pos'
+      path: '/pos'
+      fullPath: '/admin/pharmacy/pos'
+      preLoaderRoute: typeof AdminPharmacyPosRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/reports/$category': {
+      id: '/admin/reports/$category'
+      path: '/$category'
+      fullPath: '/admin/reports/$category'
+      preLoaderRoute: typeof AdminReportsCategoryRouteImport
+      parentRoute: typeof AdminReportsRoute
+    }
+    '/admin/wards/$wardId': {
+      id: '/admin/wards/$wardId'
+      path: '/$wardId'
+      fullPath: '/admin/wards/$wardId'
+      preLoaderRoute: typeof AdminWardsWardIdRouteImport
+      parentRoute: typeof AdminWardsRoute
+    }
+    '/admin/billing/invoices/$invoiceId': {
+      id: '/admin/billing/invoices/$invoiceId'
+      path: '/$invoiceId'
+      fullPath: '/admin/billing/invoices/$invoiceId'
+      preLoaderRoute: typeof AdminBillingInvoicesInvoiceIdRouteImport
+      parentRoute: typeof AdminBillingInvoicesRoute
+    }
+    '/admin/billing/invoices/new': {
+      id: '/admin/billing/invoices/new'
+      path: '/new'
+      fullPath: '/admin/billing/invoices/new'
+      preLoaderRoute: typeof AdminBillingInvoicesNewRouteImport
+      parentRoute: typeof AdminBillingInvoicesRoute
+    }
+    '/admin/laboratory/orders/$orderId': {
+      id: '/admin/laboratory/orders/$orderId'
+      path: '/orders/$orderId'
+      fullPath: '/admin/laboratory/orders/$orderId'
+      preLoaderRoute: typeof AdminLaboratoryOrdersOrderIdRouteImport
+      parentRoute: typeof AdminLaboratoryRoute
+    }
+    '/admin/patients/$patientId/edit': {
+      id: '/admin/patients/$patientId/edit'
+      path: '/edit'
+      fullPath: '/admin/patients/$patientId/edit'
+      preLoaderRoute: typeof AdminPatientsPatientIdEditRouteImport
+      parentRoute: typeof AdminPatientsPatientIdRoute
+    }
+    '/admin/pharmacy/prescriptions/$prescriptionId': {
+      id: '/admin/pharmacy/prescriptions/$prescriptionId'
+      path: '/prescriptions/$prescriptionId'
+      fullPath: '/admin/pharmacy/prescriptions/$prescriptionId'
+      preLoaderRoute: typeof AdminPharmacyPrescriptionsPrescriptionIdRouteImport
+      parentRoute: typeof AdminPharmacyRoute
+    }
+    '/admin/clinical/visits/$visitId/consultation': {
+      id: '/admin/clinical/visits/$visitId/consultation'
+      path: '/visits/$visitId/consultation'
+      fullPath: '/admin/clinical/visits/$visitId/consultation'
+      preLoaderRoute: typeof AdminClinicalVisitsVisitIdConsultationRouteImport
+      parentRoute: typeof AdminClinicalRoute
     }
   }
 }
@@ -307,9 +1188,174 @@ const ServicesRouteWithChildren = ServicesRoute._addFileChildren(
   ServicesRouteChildren,
 )
 
+interface AdminAdmissionsRouteChildren {
+  AdminAdmissionsAdmissionIdRoute: typeof AdminAdmissionsAdmissionIdRoute
+}
+
+const AdminAdmissionsRouteChildren: AdminAdmissionsRouteChildren = {
+  AdminAdmissionsAdmissionIdRoute: AdminAdmissionsAdmissionIdRoute,
+}
+
+const AdminAdmissionsRouteWithChildren = AdminAdmissionsRoute._addFileChildren(
+  AdminAdmissionsRouteChildren,
+)
+
+interface AdminAppointmentsRouteChildren {
+  AdminAppointmentsAppointmentIdRoute: typeof AdminAppointmentsAppointmentIdRoute
+  AdminAppointmentsNewRoute: typeof AdminAppointmentsNewRoute
+}
+
+const AdminAppointmentsRouteChildren: AdminAppointmentsRouteChildren = {
+  AdminAppointmentsAppointmentIdRoute: AdminAppointmentsAppointmentIdRoute,
+  AdminAppointmentsNewRoute: AdminAppointmentsNewRoute,
+}
+
+const AdminAppointmentsRouteWithChildren =
+  AdminAppointmentsRoute._addFileChildren(AdminAppointmentsRouteChildren)
+
+interface AdminBillingInvoicesRouteChildren {
+  AdminBillingInvoicesInvoiceIdRoute: typeof AdminBillingInvoicesInvoiceIdRoute
+  AdminBillingInvoicesNewRoute: typeof AdminBillingInvoicesNewRoute
+}
+
+const AdminBillingInvoicesRouteChildren: AdminBillingInvoicesRouteChildren = {
+  AdminBillingInvoicesInvoiceIdRoute: AdminBillingInvoicesInvoiceIdRoute,
+  AdminBillingInvoicesNewRoute: AdminBillingInvoicesNewRoute,
+}
+
+const AdminBillingInvoicesRouteWithChildren =
+  AdminBillingInvoicesRoute._addFileChildren(AdminBillingInvoicesRouteChildren)
+
+interface AdminBillingRouteChildren {
+  AdminBillingInvoicesRoute: typeof AdminBillingInvoicesRouteWithChildren
+  AdminBillingOutstandingRoute: typeof AdminBillingOutstandingRoute
+  AdminBillingPaymentsRoute: typeof AdminBillingPaymentsRoute
+  AdminBillingReceiptsRoute: typeof AdminBillingReceiptsRoute
+  AdminBillingServicesRoute: typeof AdminBillingServicesRoute
+}
+
+const AdminBillingRouteChildren: AdminBillingRouteChildren = {
+  AdminBillingInvoicesRoute: AdminBillingInvoicesRouteWithChildren,
+  AdminBillingOutstandingRoute: AdminBillingOutstandingRoute,
+  AdminBillingPaymentsRoute: AdminBillingPaymentsRoute,
+  AdminBillingReceiptsRoute: AdminBillingReceiptsRoute,
+  AdminBillingServicesRoute: AdminBillingServicesRoute,
+}
+
+const AdminBillingRouteWithChildren = AdminBillingRoute._addFileChildren(
+  AdminBillingRouteChildren,
+)
+
+interface AdminClinicalRouteChildren {
+  AdminClinicalVisitsVisitIdConsultationRoute: typeof AdminClinicalVisitsVisitIdConsultationRoute
+}
+
+const AdminClinicalRouteChildren: AdminClinicalRouteChildren = {
+  AdminClinicalVisitsVisitIdConsultationRoute:
+    AdminClinicalVisitsVisitIdConsultationRoute,
+}
+
+const AdminClinicalRouteWithChildren = AdminClinicalRoute._addFileChildren(
+  AdminClinicalRouteChildren,
+)
+
+interface AdminLaboratoryRouteChildren {
+  AdminLaboratoryCatalogRoute: typeof AdminLaboratoryCatalogRoute
+  AdminLaboratoryNewRoute: typeof AdminLaboratoryNewRoute
+  AdminLaboratoryOrdersOrderIdRoute: typeof AdminLaboratoryOrdersOrderIdRoute
+}
+
+const AdminLaboratoryRouteChildren: AdminLaboratoryRouteChildren = {
+  AdminLaboratoryCatalogRoute: AdminLaboratoryCatalogRoute,
+  AdminLaboratoryNewRoute: AdminLaboratoryNewRoute,
+  AdminLaboratoryOrdersOrderIdRoute: AdminLaboratoryOrdersOrderIdRoute,
+}
+
+const AdminLaboratoryRouteWithChildren = AdminLaboratoryRoute._addFileChildren(
+  AdminLaboratoryRouteChildren,
+)
+
+interface AdminPatientsPatientIdRouteChildren {
+  AdminPatientsPatientIdEditRoute: typeof AdminPatientsPatientIdEditRoute
+}
+
+const AdminPatientsPatientIdRouteChildren: AdminPatientsPatientIdRouteChildren =
+  {
+    AdminPatientsPatientIdEditRoute: AdminPatientsPatientIdEditRoute,
+  }
+
+const AdminPatientsPatientIdRouteWithChildren =
+  AdminPatientsPatientIdRoute._addFileChildren(
+    AdminPatientsPatientIdRouteChildren,
+  )
+
+interface AdminPatientsRouteChildren {
+  AdminPatientsPatientIdRoute: typeof AdminPatientsPatientIdRouteWithChildren
+  AdminPatientsNewRoute: typeof AdminPatientsNewRoute
+}
+
+const AdminPatientsRouteChildren: AdminPatientsRouteChildren = {
+  AdminPatientsPatientIdRoute: AdminPatientsPatientIdRouteWithChildren,
+  AdminPatientsNewRoute: AdminPatientsNewRoute,
+}
+
+const AdminPatientsRouteWithChildren = AdminPatientsRoute._addFileChildren(
+  AdminPatientsRouteChildren,
+)
+
+interface AdminPharmacyRouteChildren {
+  AdminPharmacyExpiryRoute: typeof AdminPharmacyExpiryRoute
+  AdminPharmacyInventoryRoute: typeof AdminPharmacyInventoryRoute
+  AdminPharmacyLowStockRoute: typeof AdminPharmacyLowStockRoute
+  AdminPharmacyMedicinesRoute: typeof AdminPharmacyMedicinesRoute
+  AdminPharmacyMovementsRoute: typeof AdminPharmacyMovementsRoute
+  AdminPharmacyPosRoute: typeof AdminPharmacyPosRoute
+  AdminPharmacyPrescriptionsPrescriptionIdRoute: typeof AdminPharmacyPrescriptionsPrescriptionIdRoute
+}
+
+const AdminPharmacyRouteChildren: AdminPharmacyRouteChildren = {
+  AdminPharmacyExpiryRoute: AdminPharmacyExpiryRoute,
+  AdminPharmacyInventoryRoute: AdminPharmacyInventoryRoute,
+  AdminPharmacyLowStockRoute: AdminPharmacyLowStockRoute,
+  AdminPharmacyMedicinesRoute: AdminPharmacyMedicinesRoute,
+  AdminPharmacyMovementsRoute: AdminPharmacyMovementsRoute,
+  AdminPharmacyPosRoute: AdminPharmacyPosRoute,
+  AdminPharmacyPrescriptionsPrescriptionIdRoute:
+    AdminPharmacyPrescriptionsPrescriptionIdRoute,
+}
+
+const AdminPharmacyRouteWithChildren = AdminPharmacyRoute._addFileChildren(
+  AdminPharmacyRouteChildren,
+)
+
+interface AdminReportsRouteChildren {
+  AdminReportsCategoryRoute: typeof AdminReportsCategoryRoute
+}
+
+const AdminReportsRouteChildren: AdminReportsRouteChildren = {
+  AdminReportsCategoryRoute: AdminReportsCategoryRoute,
+}
+
+const AdminReportsRouteWithChildren = AdminReportsRoute._addFileChildren(
+  AdminReportsRouteChildren,
+)
+
+interface AdminWardsRouteChildren {
+  AdminWardsWardIdRoute: typeof AdminWardsWardIdRoute
+}
+
+const AdminWardsRouteChildren: AdminWardsRouteChildren = {
+  AdminWardsWardIdRoute: AdminWardsWardIdRoute,
+}
+
+const AdminWardsRouteWithChildren = AdminWardsRoute._addFileChildren(
+  AdminWardsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AppointmentsRoute: AppointmentsRoute,
   ContactRoute: ContactRoute,
   DepartmentsRoute: DepartmentsRouteWithChildren,
   DoctorsRoute: DoctorsRouteWithChildren,
@@ -317,6 +1363,24 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   ServicesRoute: ServicesRouteWithChildren,
   TermsRoute: TermsRoute,
+  AdminAdmissionsRoute: AdminAdmissionsRouteWithChildren,
+  AdminAppointmentsRoute: AdminAppointmentsRouteWithChildren,
+  AdminAuditLogsRoute: AdminAuditLogsRoute,
+  AdminBedBoardRoute: AdminBedBoardRoute,
+  AdminBillingRoute: AdminBillingRouteWithChildren,
+  AdminClinicalRoute: AdminClinicalRouteWithChildren,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminDischargesRoute: AdminDischargesRoute,
+  AdminForgotPasswordRoute: AdminForgotPasswordRoute,
+  AdminLaboratoryRoute: AdminLaboratoryRouteWithChildren,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminPatientsRoute: AdminPatientsRouteWithChildren,
+  AdminPharmacyRoute: AdminPharmacyRouteWithChildren,
+  AdminPrescriptionsRoute: AdminPrescriptionsRoute,
+  AdminQueueRoute: AdminQueueRoute,
+  AdminReportsRoute: AdminReportsRouteWithChildren,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminWardsRoute: AdminWardsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
