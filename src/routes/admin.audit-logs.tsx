@@ -32,20 +32,26 @@ export const Route = createFileRoute("/admin/audit-logs")({
 function AuditLogsPage() {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loadError, setLoadError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [module, setModule] = useState("All modules");
   const [severity, setSeverity] = useState("All severity");
   const [outcome, setOutcome] = useState("All outcomes");
   const [selected, setSelected] = useState<AuditEntry | null>(null);
   const loadEntries = async () => {
+    setIsLoading(true);
+    setLoadError("");
     const { data, error } = await getSupabaseClient()
       .from("audit_logs")
-      .select("*")
+      .select(
+        "id, actor_id, action, module, target_type, target_id, severity, outcome, metadata, ip_address, created_at",
+      )
       .eq("hospital_id", GGH_HOSPITAL_ID)
       .order("created_at", { ascending: false });
     if (error) {
       setLoadError(error.message);
       setEntries([]);
+      setIsLoading(false);
       return;
     }
     setLoadError("");
@@ -53,8 +59,8 @@ function AuditLogsPage() {
       (data ?? []).map((row) => ({
         id: row.id,
         occurredAt: new Date(row.created_at).toLocaleString(),
-        actor: row.actor_id ?? "System",
-        role: "Staff",
+        actor: row.actor_id ? `User ${row.actor_id.slice(0, 8)}` : "System",
+        role: row.actor_id ? "Authenticated user" : "System",
         action: row.action,
         module: row.module,
         target: row.target_id ?? row.target_type ?? "—",
@@ -70,6 +76,7 @@ function AuditLogsPage() {
         details: JSON.stringify(row.metadata ?? {}),
       })),
     );
+    setIsLoading(false);
   };
   useEffect(() => {
     void loadEntries();
@@ -145,14 +152,7 @@ function AuditLogsPage() {
             value={module}
             options={[
               "All modules",
-              "Authentication",
-              "Patients",
-              "Appointments",
-              "Laboratory",
-              "Inventory",
-              "Pharmacy",
-              "Prescriptions",
-              "Reports",
+              ...Array.from(new Set(entries.map((entry) => entry.module))).sort(),
             ]}
             onChange={setModule}
           />
@@ -220,9 +220,15 @@ function AuditLogsPage() {
               ))}
             </tbody>
           </table>
-          {rows.length === 0 ? (
+          {isLoading ? (
             <div className="p-12 text-center text-sm text-slate-500">
-              No audit events match these filters.
+              Loading audit events from Supabase…
+            </div>
+          ) : rows.length === 0 ? (
+            <div className="p-12 text-center text-sm text-slate-500">
+              {entries.length === 0
+                ? "No audit events have been recorded in Supabase for this hospital yet."
+                : "No audit events match these filters."}
             </div>
           ) : null}
         </div>

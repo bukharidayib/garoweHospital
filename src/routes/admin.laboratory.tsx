@@ -5,9 +5,11 @@ import {
   CheckCircle2,
   Clock3,
   FlaskConical,
+  Pencil,
   Plus,
   Search,
   ShieldAlert,
+  Trash2,
 } from "lucide-react";
 
 import { AdminSectionHeading, AdminShell, PatientStatusBadge } from "@/components/admin/AdminShell";
@@ -33,24 +35,37 @@ function LaboratoryPage() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [orderList, setOrderList] = useState<typeof labOrders>([]);
   const [catalog, setCatalog] = useState<{ id: string; code: string; name: string }[]>([]);
+  const [patientOptions, setPatientOptions] = useState<
+    Array<{ id: string; number: string; name: string }>
+  >([]);
+  const [doctorOptions, setDoctorOptions] = useState<Array<{ id: string; name: string }>>([]);
   const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("All statuses");
   const [newOrderOpen, setNewOrderOpen] = useState(false);
   const [viewOrder, setViewOrder] = useState<(typeof labOrders)[number] | null>(null);
+  const [editOrder, setEditOrder] = useState<(typeof labOrders)[number] | null>(null);
+  const [deleteOrder, setDeleteOrder] = useState<(typeof labOrders)[number] | null>(null);
+  const [actionError, setActionError] = useState("");
+  const [savingAction, setSavingAction] = useState(false);
   const [newOrder, setNewOrder] = useState({
     patient: "",
     patientNumber: "",
     tests: "",
-    requestedBy: "Dr. Ahmed Yusuf",
+    requestedBy: "",
     priority: "Routine",
   });
   const [selectedTests, setSelectedTests] = useState<string[]>(["CBC"]);
+  const [editForm, setEditForm] = useState({
+    requestedBy: "",
+    priority: "Routine",
+    status: "Ordered",
+  });
   useEffect(() => {
     let active = true;
     async function loadLaboratory() {
       const client = getSupabaseClient();
-      const [ordersResult, testsResult] = await Promise.all([
+      const [ordersResult, testsResult, patientsResult, doctorsResult] = await Promise.all([
         client
           .from("lab_orders")
           .select("*")
@@ -62,27 +77,73 @@ function LaboratoryPage() {
           .eq("hospital_id", GGH_HOSPITAL_ID)
           .eq("active", true)
           .order("name"),
+        client
+          .from("patients")
+          .select("id,patient_number,first_name,last_name")
+          .eq("hospital_id", GGH_HOSPITAL_ID)
+          .order("last_name"),
+        client
+          .from("doctors")
+          .select("id,name")
+          .eq("hospital_id", GGH_HOSPITAL_ID)
+          .eq("active", true)
+          .order("name"),
       ]);
       if (!active) return;
-      if (ordersResult.error || testsResult.error) {
+      if (ordersResult.error || testsResult.error || patientsResult.error || doctorsResult.error) {
         setLoadError(
           ordersResult.error?.message ??
             testsResult.error?.message ??
+            patientsResult.error?.message ??
             "Unable to load laboratory data.",
         );
         return;
       }
-      setCatalog(testsResult.data ?? []);
+      const loadedTests = testsResult.data ?? [];
+      const loadedDoctors = doctorsResult.data ?? [];
+      setCatalog(loadedTests);
+      setPatientOptions(
+        (patientsResult.data ?? []).map((patient) => ({
+          id: patient.id,
+          number: patient.patient_number,
+          name: `${patient.first_name} ${patient.last_name}`,
+        })),
+      );
+      setDoctorOptions(
+        loadedDoctors.map((doctor) => ({
+          id: doctor.id,
+          name: doctor.name,
+        })),
+      );
+      setNewOrder((current) => ({
+        ...current,
+        requestedBy: current.requestedBy || loadedDoctors[0]?.id || "",
+      }));
+      setSelectedTests((current) =>
+        current.filter((code) => loadedTests.some((test) => test.code === code)).length
+          ? current.filter((code) => loadedTests.some((test) => test.code === code))
+          : loadedTests.slice(0, 1).map((test) => test.code),
+      );
+      const patientMap = new Map(
+        (patientsResult.data ?? []).map((patient) => [patient.id, patient]),
+      );
+      const doctorMap = new Map(
+        (doctorsResult.data ?? []).map((doctor) => [doctor.id, doctor.name]),
+      );
       setOrderList(
         (ordersResult.data ?? []).map((row) => ({
           id: row.id,
           orderNumber: row.order_number,
           patientId: row.patient_id,
-          patient: row.patient_id,
-          patientNumber: row.patient_id,
+          patient: patientMap.get(row.patient_id)
+            ? `${patientMap.get(row.patient_id)?.first_name} ${patientMap.get(row.patient_id)?.last_name}`
+            : "Unknown patient",
+          patientNumber: patientMap.get(row.patient_id)?.patient_number ?? row.patient_id,
           visit: row.visit_id ?? "—",
           tests: "See order details",
-          requestedBy: row.requested_by ?? "Unassigned",
+          requestedBy: row.requested_by
+            ? (doctorMap.get(row.requested_by) ?? "Unknown doctor")
+            : "Unassigned",
           department: "Unassigned",
           priority: row.priority,
           requested: new Date(row.requested_at).toLocaleString(),
@@ -109,15 +170,20 @@ function LaboratoryPage() {
   );
   const updateOrder = (field: keyof typeof newOrder, value: string) =>
     setNewOrder((current) => ({ ...current, [field]: value }));
+  const selectedPatient = patientOptions.find((patient) => patient.id === newOrder.patient);
   const createLabOrder = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!newOrder.patient || selectedTests.length === 0) return;
+    if (!newOrder.patient || !newOrder.requestedBy || selectedTests.length === 0) {
+      setLoadError("Select a patient, requesting doctor, and at least one laboratory test.");
+      return;
+    }
     const client = getSupabaseClient();
     const { data, error } = await client
       .from("lab_orders")
       .insert({
         hospital_id: GGH_HOSPITAL_ID,
         patient_id: newOrder.patient,
+        requested_by: newOrder.requestedBy || null,
         order_number: `GGH-LAB-${Date.now()}`,
         priority: newOrder.priority,
         status: "Ordered",
@@ -146,11 +212,14 @@ function LaboratoryPage() {
         id: data.id,
         orderNumber: data.order_number,
         patientId: data.patient_id,
-        patient: data.patient_id,
-        patientNumber: data.patient_id,
+        patient: selectedPatient?.name ?? "Unknown patient",
+        patientNumber: selectedPatient?.number ?? data.patient_id,
         visit: data.visit_id ?? "—",
         tests: testRows.map((test) => test.name).join(" · "),
-        requestedBy: data.requested_by ?? "Unassigned",
+        requestedBy: data.requested_by
+          ? (doctorOptions.find((doctor) => doctor.id === data.requested_by)?.name ??
+            "Unknown doctor")
+          : "Unassigned",
         department: "Unassigned",
         priority: data.priority,
         requested: new Date(data.requested_at).toLocaleString(),
@@ -159,7 +228,14 @@ function LaboratoryPage() {
       },
       ...current,
     ]);
-    setNewOpen(false);
+    setNewOrderOpen(false);
+    setNewOrder({
+      patient: "",
+      patientNumber: "",
+      tests: "",
+      requestedBy: "",
+      priority: "Routine",
+    });
     setSelectedTests([catalog[0]?.code ?? ""]);
     return;
     const tests = selectedTests
@@ -188,10 +264,79 @@ function LaboratoryPage() {
       patient: "",
       patientNumber: "",
       tests: "",
-      requestedBy: "Dr. Ahmed Yusuf",
+      requestedBy: "",
       priority: "Routine",
     });
     setSelectedTests(["CBC"]);
+  };
+  const openEditOrder = (order: (typeof labOrders)[number]) => {
+    setEditOrder(order);
+    setEditForm({
+      requestedBy: doctorOptions.find((doctor) => doctor.name === order.requestedBy)?.id ?? "",
+      priority: order.priority,
+      status: order.status,
+    });
+    setActionError("");
+  };
+  const updateLabOrder = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editOrder) return;
+    setSavingAction(true);
+    const { error } = await getSupabaseClient()
+      .from("lab_orders")
+      .update({
+        requested_by: editForm.requestedBy || null,
+        priority: editForm.priority,
+        status: editForm.status,
+      })
+      .eq("id", editOrder.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (error) {
+      setActionError(error.message);
+      setSavingAction(false);
+      return;
+    }
+    setOrderList((current) =>
+      current.map((order) =>
+        order.id === editOrder.id
+          ? {
+              ...order,
+              requestedBy: editForm.requestedBy
+                ? (doctorOptions.find((doctor) => doctor.id === editForm.requestedBy)?.name ??
+                  "Unknown doctor")
+                : "Unassigned",
+              priority: editForm.priority as "Routine" | "Urgent" | "STAT",
+              status: editForm.status as typeof order.status,
+            }
+          : order,
+      ),
+    );
+    setEditOrder(null);
+    setSavingAction(false);
+  };
+  const confirmDeleteLabOrder = async () => {
+    if (!deleteOrder) return;
+    setSavingAction(true);
+    const client = getSupabaseClient();
+    const items = await client.from("lab_order_items").delete().eq("lab_order_id", deleteOrder.id);
+    if (items.error) {
+      setActionError(items.error.message);
+      setSavingAction(false);
+      return;
+    }
+    const { error } = await client
+      .from("lab_orders")
+      .delete()
+      .eq("id", deleteOrder.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (error) {
+      setActionError(error.message);
+      setSavingAction(false);
+      return;
+    }
+    setOrderList((current) => current.filter((order) => order.id !== deleteOrder.id));
+    setDeleteOrder(null);
+    setSavingAction(false);
   };
   if (pathname !== "/admin/laboratory") return <Outlet />;
   return (
@@ -354,13 +499,34 @@ function LaboratoryPage() {
                     </td>
                     <td className="px-5 py-4 font-semibold text-slate-600">{row.tat}</td>
                     <td className="px-5 py-4">
-                      <button
-                        type="button"
-                        onClick={() => setViewOrder(row)}
-                        className="text-xs font-semibold text-[#22577a] hover:underline"
-                      >
-                        Open order
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setViewOrder(row)}
+                          className="text-xs font-semibold text-[#22577a] hover:underline"
+                        >
+                          Open
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openEditOrder(row)}
+                          className="text-slate-500 hover:text-[#22577a]"
+                          aria-label="Update lab order"
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDeleteOrder(row);
+                            setActionError("");
+                          }}
+                          className="text-red-600 hover:text-red-700"
+                          aria-label="Delete lab order"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -416,13 +582,24 @@ function LaboratoryPage() {
               <LabField
                 label="Patient name"
                 value={newOrder.patient}
-                onChange={(value) => updateOrder("patient", value)}
+                as="select"
+                onChange={(value) => {
+                  const patient = patientOptions.find((item) => item.id === value);
+                  setNewOrder((current) => ({
+                    ...current,
+                    patient: value,
+                    patientNumber: patient?.number ?? "",
+                  }));
+                }}
+                options={patientOptions.map((patient) => `${patient.number} · ${patient.name}`)}
+                optionValues={patientOptions.map((patient) => patient.id)}
                 required
               />
               <LabField
                 label="Patient number"
-                value={newOrder.patientNumber}
-                onChange={(value) => updateOrder("patientNumber", value)}
+                value={selectedPatient?.number ?? ""}
+                onChange={() => undefined}
+                readOnly
               />
               <div className="sm:col-span-2">
                 <p className="mb-2 text-sm font-medium text-slate-700">Laboratory tests</p>
@@ -465,6 +642,10 @@ function LaboratoryPage() {
                 label="Requested by"
                 value={newOrder.requestedBy}
                 onChange={(value) => updateOrder("requestedBy", value)}
+                as="select"
+                options={doctorOptions.map((doctor) => doctor.name)}
+                optionValues={doctorOptions.map((doctor) => doctor.id)}
+                required
               />
               <LabField
                 label="Priority"
@@ -483,6 +664,77 @@ function LaboratoryPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={Boolean(editOrder)} onOpenChange={(open) => !open && setEditOrder(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update lab order</DialogTitle>
+            <DialogDescription>{editOrder?.orderNumber}</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={updateLabOrder} className="space-y-4">
+            <LabField
+              label="Requested by"
+              as="select"
+              value={editForm.requestedBy}
+              onChange={(value) => setEditForm((current) => ({ ...current, requestedBy: value }))}
+              options={doctorOptions.map((doctor) => doctor.name)}
+              optionValues={doctorOptions.map((doctor) => doctor.id)}
+            />
+            <LabField
+              label="Priority"
+              as="select"
+              value={editForm.priority}
+              onChange={(value) => setEditForm((current) => ({ ...current, priority: value }))}
+              options={["Routine", "Urgent", "STAT"]}
+            />
+            <LabField
+              label="Status"
+              as="select"
+              value={editForm.status}
+              onChange={(value) => setEditForm((current) => ({ ...current, status: value }))}
+              options={[
+                "Ordered",
+                "Awaiting Sample",
+                "Sample Collected",
+                "Processing",
+                "Partially Completed",
+                "Verified",
+              ]}
+            />
+            {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditOrder(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={savingAction}>
+                {savingAction ? "Saving..." : "Save changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={Boolean(deleteOrder)} onOpenChange={(open) => !open && setDeleteOrder(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete lab order?</DialogTitle>
+            <DialogDescription>
+              This permanently removes {deleteOrder?.orderNumber} and its test items from Supabase.
+            </DialogDescription>
+          </DialogHeader>
+          {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOrder(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void confirmDeleteLabOrder()}
+              disabled={savingAction}
+            >
+              {savingAction ? "Deleting..." : "Delete order"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       <Dialog open={Boolean(viewOrder)} onOpenChange={(open) => !open && setViewOrder(null)}>
@@ -540,6 +792,8 @@ function LabField({
   className = "",
   as = "input",
   options = [],
+  optionValues = options,
+  readOnly = false,
 }: {
   label: string;
   value: string;
@@ -549,6 +803,8 @@ function LabField({
   className?: string;
   as?: "input" | "select";
   options?: string[];
+  optionValues?: string[];
+  readOnly?: boolean;
 }) {
   return (
     <label className={`space-y-2 text-sm font-medium text-slate-700 ${className}`}>
@@ -560,8 +816,10 @@ function LabField({
           className="field-control"
           required={required}
         >
-          {options.map((option) => (
-            <option key={option}>{option}</option>
+          {options.map((option, index) => (
+            <option key={optionValues[index] ?? option} value={optionValues[index] ?? option}>
+              {option}
+            </option>
           ))}
         </select>
       ) : (
@@ -571,6 +829,7 @@ function LabField({
           placeholder={placeholder}
           className="field-control"
           required={required}
+          readOnly={readOnly}
         />
       )}
     </label>

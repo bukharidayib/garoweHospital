@@ -36,6 +36,19 @@ function PatientsPage() {
   const [status, setStatus] = useState("All statuses");
   const [registerOpen, setRegisterOpen] = useState(false);
   const [viewPatient, setViewPatient] = useState<Patient | null>(null);
+  const [editPatient, setEditPatient] = useState<Patient | null>(null);
+  const [deletePatient, setDeletePatient] = useState<Patient | null>(null);
+  const [actionError, setActionError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [editForm, setEditForm] = useState({
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    gender: "",
+    phone: "",
+    address: "",
+    status: "Active",
+  });
   const [registerError, setRegisterError] = useState("");
   const [form, setForm] = useState({
     firstName: "",
@@ -133,6 +146,86 @@ function PatientsPage() {
 
   function updateForm(field: keyof typeof form, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function openEdit(patient: Patient) {
+    setEditPatient(patient);
+    setEditForm({
+      firstName: patient.firstName,
+      lastName: patient.lastName,
+      dateOfBirth: patient.dateOfBirth,
+      gender: patient.gender,
+      phone: patient.phone === "Not recorded" ? "" : patient.phone,
+      address: patient.address === "Not recorded" ? "" : patient.address,
+      status: patient.status,
+    });
+    setActionError("");
+  }
+
+  async function updatePatient(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editPatient) return;
+    setSaving(true);
+    setActionError("");
+    const { data, error } = await getSupabaseClient()
+      .from("patients")
+      .update({
+        first_name: editForm.firstName,
+        last_name: editForm.lastName,
+        date_of_birth: editForm.dateOfBirth || null,
+        gender: editForm.gender,
+        phone: editForm.phone || null,
+        address: editForm.address || null,
+        status: editForm.status,
+      })
+      .eq("id", editPatient.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID)
+      .select("*")
+      .single();
+    if (error || !data) {
+      setActionError(error?.message ?? "Unable to update patient.");
+      setSaving(false);
+      return;
+    }
+    setPatientRows((current) =>
+      current.map((patient) =>
+        patient.id === data.id
+          ? {
+              ...patient,
+              firstName: data.first_name,
+              lastName: data.last_name,
+              dateOfBirth: data.date_of_birth ?? "",
+              gender: data.gender === "Female" ? "Female" : "Male",
+              phone: data.phone ?? "Not recorded",
+              address: data.address ?? "Not recorded",
+              status: data.status as Patient["status"],
+            }
+          : patient,
+      ),
+    );
+    setEditPatient(null);
+    setViewPatient(null);
+    setSaving(false);
+  }
+
+  async function confirmDeletePatient() {
+    if (!deletePatient) return;
+    setSaving(true);
+    setActionError("");
+    const { error } = await getSupabaseClient()
+      .from("patients")
+      .delete()
+      .eq("id", deletePatient.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (error) {
+      setActionError(error.message);
+      setSaving(false);
+      return;
+    }
+    setPatientRows((current) => current.filter((patient) => patient.id !== deletePatient.id));
+    setDeletePatient(null);
+    setViewPatient(null);
+    setSaving(false);
   }
 
   async function registerPatient(event: React.FormEvent<HTMLFormElement>) {
@@ -475,12 +568,120 @@ function PatientsPage() {
                 </Detail>
               </div>
               <DialogFooter>
+                <Button variant="outline" onClick={() => openEdit(viewPatient)}>
+                  Update patient
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setActionError("");
+                    setDeletePatient(viewPatient);
+                  }}
+                >
+                  Delete patient
+                </Button>
                 <Button variant="outline" onClick={() => setViewPatient(null)}>
                   Close
                 </Button>
               </DialogFooter>
             </>
           ) : null}
+        </DialogContent>
+      </Dialog>
+      <Dialog open={Boolean(editPatient)} onOpenChange={(open) => !open && setEditPatient(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Update patient</DialogTitle>
+            <DialogDescription>
+              Changes are saved directly to the Supabase patients table.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={updatePatient} className="space-y-5">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                label="First name *"
+                value={editForm.firstName}
+                onChange={(value) => setEditForm((current) => ({ ...current, firstName: value }))}
+                required
+              />
+              <FormField
+                label="Last name *"
+                value={editForm.lastName}
+                onChange={(value) => setEditForm((current) => ({ ...current, lastName: value }))}
+                required
+              />
+              <FormField
+                label="Date of birth"
+                type="date"
+                value={editForm.dateOfBirth}
+                onChange={(value) => setEditForm((current) => ({ ...current, dateOfBirth: value }))}
+              />
+              <FormField
+                label="Phone number"
+                value={editForm.phone}
+                onChange={(value) => setEditForm((current) => ({ ...current, phone: value }))}
+              />
+              <FormField
+                label="Gender"
+                as="select"
+                value={editForm.gender}
+                options={["Female", "Male"]}
+                onChange={(value) => setEditForm((current) => ({ ...current, gender: value }))}
+              />
+              <FormField
+                label="Status"
+                as="select"
+                value={editForm.status}
+                options={["Active", "Waiting", "Admitted", "Archived"]}
+                onChange={(value) => setEditForm((current) => ({ ...current, status: value }))}
+              />
+              <FormField
+                label="Address"
+                value={editForm.address}
+                onChange={(value) => setEditForm((current) => ({ ...current, address: value }))}
+                className="sm:col-span-2"
+              />
+            </div>
+            {actionError ? <p className="text-sm text-red-600">{actionError}</p> : null}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setEditPatient(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Saving..." : "Save changes"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(deletePatient)}
+        onOpenChange={(open) => !open && setDeletePatient(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete patient record?</DialogTitle>
+            <DialogDescription>
+              This permanently deletes {deletePatient?.firstName} {deletePatient?.lastName} from
+              Supabase. Existing visits, appointments, billing, or clinical records may prevent
+              deletion.
+            </DialogDescription>
+          </DialogHeader>
+          {actionError ? (
+            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{actionError}</p>
+          ) : null}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletePatient(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void confirmDeletePatient()}
+              disabled={saving}
+            >
+              {saving ? "Deleting..." : "Yes, delete patient"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </AdminShell>

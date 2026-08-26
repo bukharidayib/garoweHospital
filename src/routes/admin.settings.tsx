@@ -9,6 +9,9 @@ import {
   Save,
   ShieldCheck,
   SlidersHorizontal,
+  Users,
+  Plus,
+  Trash2,
 } from "lucide-react";
 import { AdminSectionHeading, AdminShell } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -26,6 +29,7 @@ const tabs = [
   { id: "operations", label: "Operations", icon: SlidersHorizontal },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "security", label: "Security", icon: LockKeyhole },
+  { id: "directory", label: "Doctors & departments", icon: Users },
 ] as const;
 type TabId = (typeof tabs)[number]["id"];
 
@@ -148,17 +152,21 @@ function SettingsPage() {
             </button>
           ))}
         </nav>
-        <form id="settings-form" onSubmit={save} className="space-y-5">
-          {active === "hospital" ? (
-            <HospitalTab settings={settings} update={update} />
-          ) : active === "operations" ? (
-            <OperationsTab settings={settings} update={update} />
-          ) : active === "notifications" ? (
-            <NotificationsTab settings={settings} update={update} />
-          ) : (
-            <SecurityTab settings={settings} update={update} />
-          )}
-        </form>
+        {active === "directory" ? (
+          <DirectoryTab />
+        ) : (
+          <form id="settings-form" onSubmit={save} className="space-y-5">
+            {active === "hospital" ? (
+              <HospitalTab settings={settings} update={update} />
+            ) : active === "operations" ? (
+              <OperationsTab settings={settings} update={update} />
+            ) : active === "notifications" ? (
+              <NotificationsTab settings={settings} update={update} />
+            ) : active === "security" ? (
+              <SecurityTab settings={settings} update={update} />
+            ) : null}
+          </form>
+        )}
       </div>
       <div className="mt-5 flex justify-end">
         <button
@@ -170,6 +178,266 @@ function SettingsPage() {
         </button>
       </div>
     </AdminShell>
+  );
+}
+
+function DirectoryTab() {
+  const [departments, setDepartments] = useState<
+    Array<{ id: string; name: string; code: string; active: boolean }>
+  >([]);
+  const [doctors, setDoctors] = useState<
+    Array<{ id: string; name: string; phone: string; specialty: string; active: boolean }>
+  >([]);
+  const [departmentName, setDepartmentName] = useState("");
+  const [departmentCode, setDepartmentCode] = useState("");
+  const [doctor, setDoctor] = useState({ name: "", phone: "", specialty: "" });
+  const [error, setError] = useState("");
+  const load = async () => {
+    const client = getSupabaseClient();
+    const [departmentResult, doctorResult] = await Promise.all([
+      client
+        .from("departments")
+        .select("id,name,code,active")
+        .eq("hospital_id", GGH_HOSPITAL_ID)
+        .order("name"),
+      client
+        .from("doctors")
+        .select("id,name,phone,specialty,active")
+        .eq("hospital_id", GGH_HOSPITAL_ID)
+        .order("name"),
+    ]);
+    if (departmentResult.error || doctorResult.error) {
+      setError(
+        (departmentResult.error ?? doctorResult.error)?.message ?? "Unable to load directory.",
+      );
+      return;
+    }
+    setDepartments(departmentResult.data ?? []);
+    setDoctors(
+      (doctorResult.data ?? []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        phone: item.phone ?? "",
+        specialty: item.specialty ?? "",
+        active: item.active,
+      })),
+    );
+  };
+  useEffect(() => {
+    void load();
+  }, []);
+  const addDepartment = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!departmentName) return;
+    const { data, error: insertError } = await getSupabaseClient()
+      .from("departments")
+      .insert({
+        hospital_id: GGH_HOSPITAL_ID,
+        name: departmentName,
+        code: departmentCode || null,
+        active: true,
+      })
+      .select("id,name,code,active")
+      .single();
+    if (insertError || !data) {
+      setError(insertError?.message ?? "Unable to add department.");
+      return;
+    }
+    setDepartments((current) => [...current, data]);
+    setDepartmentName("");
+    setDepartmentCode("");
+  };
+  const toggleDepartment = async (department: (typeof departments)[number]) => {
+    const { error: updateError } = await getSupabaseClient()
+      .from("departments")
+      .update({ active: !department.active })
+      .eq("id", department.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setDepartments((current) =>
+      current.map((item) => (item.id === department.id ? { ...item, active: !item.active } : item)),
+    );
+  };
+  const deleteDepartment = async (id: string) => {
+    const { error: deleteError } = await getSupabaseClient()
+      .from("departments")
+      .delete()
+      .eq("id", id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (deleteError) {
+      setError(deleteError.message);
+      return;
+    }
+    setDepartments((current) => current.filter((item) => item.id !== id));
+  };
+  const addDoctor = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!doctor.name) {
+      setError("Doctor name is required.");
+      return;
+    }
+    const { data, error: insertError } = await getSupabaseClient()
+      .from("doctors")
+      .insert({
+        hospital_id: GGH_HOSPITAL_ID,
+        name: doctor.name,
+        phone: doctor.phone || null,
+        specialty: doctor.specialty || null,
+        active: true,
+      })
+      .select("id,name,phone,specialty,active")
+      .single();
+    if (insertError || !data) {
+      setError(insertError?.message ?? "Unable to add doctor.");
+      return;
+    }
+    setDoctors((current) => [
+      ...current,
+      {
+        id: data.id,
+        name: data.name,
+        phone: data.phone ?? "",
+        specialty: data.specialty ?? "",
+        active: data.active,
+      },
+    ]);
+    setDoctor({ name: "", phone: "", specialty: "" });
+  };
+  const toggleDoctor = async (doctorRecord: (typeof doctors)[number]) => {
+    const { error: updateError } = await getSupabaseClient()
+      .from("doctors")
+      .update({ active: !doctorRecord.active })
+      .eq("hospital_id", GGH_HOSPITAL_ID)
+      .eq("id", doctorRecord.id);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setDoctors((current) =>
+      current.map((item) =>
+        item.id === doctorRecord.id ? { ...item, active: !doctorRecord.active } : item,
+      ),
+    );
+  };
+  return (
+    <SettingsSection
+      icon={<Users />}
+      title="Doctors and departments"
+      description="Manage the directory used by appointments, laboratory orders, visits, and prescriptions."
+    >
+      {error ? <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p> : null}
+      <div className="grid gap-5 xl:grid-cols-2">
+        <div>
+          <h3 className="font-semibold">Departments</h3>
+          <form onSubmit={addDepartment} className="mt-3 grid gap-2 sm:grid-cols-[1fr_120px_auto]">
+            <input
+              className="field-control"
+              placeholder="Department name"
+              value={departmentName}
+              onChange={(event) => setDepartmentName(event.target.value)}
+            />
+            <input
+              className="field-control"
+              placeholder="Code"
+              value={departmentCode}
+              onChange={(event) => setDepartmentCode(event.target.value)}
+            />
+            <Button type="submit">
+              <Plus /> Add
+            </Button>
+          </form>
+          <div className="mt-4 space-y-2">
+            {departments.map((department) => (
+              <div
+                key={department.id}
+                className="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-sm"
+              >
+                <span>
+                  <strong>{department.name}</strong>
+                  <span className="ml-2 text-xs text-slate-400">{department.code ?? ""}</span>
+                </span>
+                <span className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void toggleDepartment(department)}
+                    className="text-xs font-semibold text-[#22577a]"
+                  >
+                    {department.active ? "Deactivate" : "Activate"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void deleteDepartment(department.id)}
+                    className="text-red-600"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h3 className="font-semibold">Doctors</h3>
+          <form onSubmit={addDoctor} className="mt-3 space-y-2">
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                className="field-control"
+                placeholder="Doctor full name"
+                value={doctor.name}
+                onChange={(event) =>
+                  setDoctor((current) => ({ ...current, name: event.target.value }))
+                }
+                required
+              />
+              <input
+                className="field-control"
+                placeholder="Phone"
+                value={doctor.phone}
+                onChange={(event) =>
+                  setDoctor((current) => ({ ...current, phone: event.target.value }))
+                }
+              />
+              <input
+                className="field-control"
+                placeholder="Specialty"
+                value={doctor.specialty}
+                onChange={(event) =>
+                  setDoctor((current) => ({ ...current, specialty: event.target.value }))
+                }
+              />
+            </div>
+            <Button type="submit">
+              <Plus /> Add doctor
+            </Button>
+          </form>
+          <div className="mt-4 space-y-2">
+            {doctors.map((doctor) => (
+              <div
+                key={doctor.id}
+                className="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-sm"
+              >
+                <span>
+                  <strong>{doctor.name}</strong>
+                  <span className="block text-xs text-slate-400">
+                    {doctor.specialty || "General"} {doctor.phone ? `· ${doctor.phone}` : ""}
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void toggleDoctor(doctor)}
+                  className="text-xs font-semibold text-red-600"
+                >
+                  {doctor.active ? "Deactivate" : "Activate"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </SettingsSection>
   );
 }
 

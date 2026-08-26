@@ -1,17 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  Banknote,
-  CreditCard,
-  Filter,
-  Receipt,
-  Search,
-  WalletCards,
-} from "lucide-react";
+import { ArrowRight, Banknote, Filter, Search, WalletCards } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AdminSectionHeading, AdminShell } from "@/components/admin/AdminShell";
-import { Button } from "@/components/ui/button";
 import { formatMoney, invoices } from "@/content/billing";
 import { GGH_HOSPITAL_ID } from "@/lib/supabase/hospital";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -25,6 +16,7 @@ function BillingPage() {
   const [invoiceList, setInvoiceList] = useState<typeof invoices>([]);
   const [revenueTrend, setRevenueTrend] = useState<{ day: string; value: number }[]>([]);
   const [paymentTotal, setPaymentTotal] = useState(0);
+  const [paymentMethods, setPaymentMethods] = useState({ Cash: 0, "Sahal Merchant": 0 });
   const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const rows = useMemo(
@@ -85,6 +77,14 @@ function BillingPage() {
       setPaymentTotal(
         (paymentsResult.data ?? []).reduce((sum, row) => sum + Number(row.amount ?? 0), 0),
       );
+      setPaymentMethods({
+        Cash: (paymentsResult.data ?? [])
+          .filter((row) => row.payment_method === "Cash")
+          .reduce((sum, row) => sum + Number(row.amount ?? 0), 0),
+        "Sahal Merchant": (paymentsResult.data ?? [])
+          .filter((row) => row.payment_method === "Sahal Merchant")
+          .reduce((sum, row) => sum + Number(row.amount ?? 0), 0),
+      });
       const grouped = new Map<string, number>();
       for (const payment of paymentsResult.data ?? []) {
         const day = payment.received_at.slice(0, 10);
@@ -112,13 +112,9 @@ function BillingPage() {
         title="Billing"
         description="Today’s cashier workspace and financial overview."
         action={
-          <div className="flex gap-2">
-            <Button asChild>
-              <a href="/admin/billing/invoices/new">
-                <Receipt /> Create invoice
-              </a>
-            </Button>
-          </div>
+          <span className="rounded-full bg-[#edf5f5] px-3 py-2 text-xs font-semibold text-[#22577a]">
+            Invoices are created from Pharmacy POS
+          </span>
         }
       />
       {loadError ? (
@@ -213,9 +209,8 @@ function BillingPage() {
           <h3 className="font-display text-lg font-semibold">Payments by method</h3>
           <div className="mt-5 space-y-5">
             {[
-              ["Cash", 560, Banknote, "#38a3a5"],
-              ["Mobile Money", 420, WalletCards, "#22577a"],
-              ["Card / transfer", 200, CreditCard, "#e9a23b"],
+              ["Cash", paymentMethods.Cash, Banknote, "#38a3a5"],
+              ["Sahal Merchant", paymentMethods["Sahal Merchant"], WalletCards, "#22577a"],
             ].map(([label, amount, Icon, color]) => (
               <div key={String(label)}>
                 <div className="flex items-center justify-between text-xs">

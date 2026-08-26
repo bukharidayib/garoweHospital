@@ -7,8 +7,6 @@ export type AppointmentStatus =
   | "Completed"
   | "Cancelled"
   | "No Show";
-export type QueueStatus =
-  "Waiting" | "Vitals" | "Ready for Doctor" | "In Consultation" | "Completed";
 
 export const appointmentRows = [
   {
@@ -108,69 +106,6 @@ export const appointmentRows = [
     type: "Follow-up",
     status: "No Show" as AppointmentStatus,
     wait: "—",
-  },
-];
-
-export const queueRows = [
-  {
-    queue: "GEN-014",
-    patientId: "p-00133",
-    patient: "Sahra Nur",
-    patientNumber: "GGH-PAT-000133",
-    arrival: "08:43",
-    department: "General Medicine",
-    doctor: "Dr. Ahmed Yusuf",
-    priority: "Urgent",
-    wait: 47,
-    status: "Waiting" as QueueStatus,
-  },
-  {
-    queue: "EMR-006",
-    patientId: "p-00134",
-    patient: "Abdi Warsame",
-    patientNumber: "GGH-PAT-000134",
-    arrival: "09:48",
-    department: "Emergency",
-    doctor: "Dr. Hassan Ismail",
-    priority: "Emergency",
-    wait: 12,
-    status: "Vitals" as QueueStatus,
-  },
-  {
-    queue: "PED-009",
-    patientId: "p-00131",
-    patient: "Mohamed Ali",
-    patientNumber: "GGH-PAT-000131",
-    arrival: "08:52",
-    department: "Pediatrics",
-    doctor: "Dr. Hawa Omar",
-    priority: "Normal",
-    wait: 18,
-    status: "In Consultation" as QueueStatus,
-  },
-  {
-    queue: "GEN-015",
-    patientId: "p-00142",
-    patient: "Yusuf Abdullahi",
-    patientNumber: "GGH-PAT-000142",
-    arrival: "10:06",
-    department: "General Medicine",
-    doctor: "Dr. Ahmed Yusuf",
-    priority: "Normal",
-    wait: 22,
-    status: "Ready for Doctor" as QueueStatus,
-  },
-  {
-    queue: "MAT-004",
-    patientId: "p-00138",
-    patient: "Maryan Ibrahim",
-    patientNumber: "GGH-PAT-000138",
-    arrival: "10:21",
-    department: "Obstetrics & Gynecology",
-    doctor: "Dr. Hawa Omar",
-    priority: "Normal",
-    wait: 8,
-    status: "Waiting" as QueueStatus,
   },
 ];
 

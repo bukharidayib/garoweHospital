@@ -33,7 +33,6 @@ import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminPatientsRouteImport } from './routes/admin.patients'
 import { Route as AdminPharmacyRouteImport } from './routes/admin.pharmacy'
 import { Route as AdminPrescriptionsRouteImport } from './routes/admin.prescriptions'
-import { Route as AdminQueueRouteImport } from './routes/admin.queue'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminWardsRouteImport } from './routes/admin.wards'
@@ -185,11 +184,6 @@ const AdminPharmacyRoute = AdminPharmacyRouteImport.update({
 const AdminPrescriptionsRoute = AdminPrescriptionsRouteImport.update({
   id: '/admin/prescriptions',
   path: '/admin/prescriptions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminQueueRoute = AdminQueueRouteImport.update({
-  id: '/admin/queue',
-  path: '/admin/queue',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -385,7 +379,6 @@ export interface FileRoutesByFullPath {
   '/admin/patients': typeof AdminPatientsRouteWithChildren
   '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
-  '/admin/queue': typeof AdminQueueRoute
   '/admin/reports': typeof AdminReportsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/wards': typeof AdminWardsRouteWithChildren
@@ -444,7 +437,6 @@ export interface FileRoutesByTo {
   '/admin/patients': typeof AdminPatientsRouteWithChildren
   '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
-  '/admin/queue': typeof AdminQueueRoute
   '/admin/reports': typeof AdminReportsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/wards': typeof AdminWardsRouteWithChildren
@@ -504,7 +496,6 @@ export interface FileRoutesById {
   '/admin/patients': typeof AdminPatientsRouteWithChildren
   '/admin/pharmacy': typeof AdminPharmacyRouteWithChildren
   '/admin/prescriptions': typeof AdminPrescriptionsRoute
-  '/admin/queue': typeof AdminQueueRoute
   '/admin/reports': typeof AdminReportsRouteWithChildren
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/wards': typeof AdminWardsRouteWithChildren
@@ -565,7 +556,6 @@ export interface FileRouteTypes {
     | '/admin/patients'
     | '/admin/pharmacy'
     | '/admin/prescriptions'
-    | '/admin/queue'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/wards'
@@ -624,7 +614,6 @@ export interface FileRouteTypes {
     | '/admin/patients'
     | '/admin/pharmacy'
     | '/admin/prescriptions'
-    | '/admin/queue'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/wards'
@@ -683,7 +672,6 @@ export interface FileRouteTypes {
     | '/admin/patients'
     | '/admin/pharmacy'
     | '/admin/prescriptions'
-    | '/admin/queue'
     | '/admin/reports'
     | '/admin/settings'
     | '/admin/wards'
@@ -743,7 +731,6 @@ export interface RootRouteChildren {
   AdminPatientsRoute: typeof AdminPatientsRouteWithChildren
   AdminPharmacyRoute: typeof AdminPharmacyRouteWithChildren
   AdminPrescriptionsRoute: typeof AdminPrescriptionsRoute
-  AdminQueueRoute: typeof AdminQueueRoute
   AdminReportsRoute: typeof AdminReportsRouteWithChildren
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminWardsRoute: typeof AdminWardsRouteWithChildren
@@ -917,13 +904,6 @@ declare module '@tanstack/react-router' {
       path: '/admin/prescriptions'
       fullPath: '/admin/prescriptions'
       preLoaderRoute: typeof AdminPrescriptionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/queue': {
-      id: '/admin/queue'
-      path: '/admin/queue'
-      fullPath: '/admin/queue'
-      preLoaderRoute: typeof AdminQueueRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/reports': {
@@ -1377,7 +1357,6 @@ const rootRouteChildren: RootRouteChildren = {
   AdminPatientsRoute: AdminPatientsRouteWithChildren,
   AdminPharmacyRoute: AdminPharmacyRouteWithChildren,
   AdminPrescriptionsRoute: AdminPrescriptionsRoute,
-  AdminQueueRoute: AdminQueueRoute,
   AdminReportsRoute: AdminReportsRouteWithChildren,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminWardsRoute: AdminWardsRouteWithChildren,

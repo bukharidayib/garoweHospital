@@ -1,7 +1,6 @@
 import { Link, Outlet, createFileRoute, useRouterState } from "@tanstack/react-router";
-import { ArrowRight, Plus, Search } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import { AdminSectionHeading, AdminShell } from "@/components/admin/AdminShell";
-import { Button } from "@/components/ui/button";
 import { formatMoney, invoices } from "@/content/billing";
 import { InvoiceBadge } from "@/routes/admin.billing";
 
@@ -19,13 +18,9 @@ function InvoicesPage() {
         title="Invoices"
         description="Draft, issue, and review patient balances."
         action={
-          <div className="flex gap-2">
-            <Button asChild>
-              <a href="/admin/billing/invoices/new">
-                <Plus /> Create invoice
-              </a>
-            </Button>
-          </div>
+          <span className="rounded-full bg-[#edf5f5] px-3 py-2 text-xs font-semibold text-[#22577a]">
+            Created from Pharmacy POS
+          </span>
         }
       />
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">

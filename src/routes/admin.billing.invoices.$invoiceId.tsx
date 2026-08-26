@@ -9,7 +9,7 @@ import { GGH_HOSPITAL_ID } from "@/lib/supabase/hospital";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 export const Route = createFileRoute("/admin/billing/invoices/$invoiceId")({
-  head: () => ({ meta: [{ title: "Invoice Details | GGH Management Portal" }] }),
+  head: () => ({ meta: [{ title: "Payment Details | GGH Management Portal" }] }),
   component: InvoicePage,
 });
 function InvoicePage() {
@@ -83,16 +83,64 @@ function InvoicePage() {
   }, [invoiceId]);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [amount, setAmount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+  const [paymentError, setPaymentError] = useState("");
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  const recordPayment = async () => {
+    if (!invoice || amount <= 0 || amount > invoice.balance) {
+      setPaymentError("Enter an amount up to the outstanding balance.");
+      return;
+    }
+    setPaymentSaving(true);
+    setPaymentError("");
+    const client = getSupabaseClient();
+    const payment = await client
+      .from("payments")
+      .insert({
+        hospital_id: GGH_HOSPITAL_ID,
+        invoice_id: invoice.id,
+        patient_id: invoice.patientId,
+        payment_method: paymentMethod,
+        amount,
+        received_at: new Date().toISOString(),
+      })
+      .select("id")
+      .single();
+    if (payment.error || !payment.data) {
+      setPaymentError(payment.error?.message ?? "Unable to record payment.");
+      setPaymentSaving(false);
+      return;
+    }
+    const paid = invoice.paid + amount;
+    const balance = Math.max(0, invoice.total - paid);
+    const nextStatus = balance <= 0 ? "Paid" : paid > 0 ? "Partially Paid" : "Unpaid";
+    const update = await client
+      .from("invoices")
+      .update({ paid, due: balance, status: nextStatus })
+      .eq("id", invoice.id)
+      .eq("hospital_id", GGH_HOSPITAL_ID);
+    if (update.error) {
+      setPaymentError(update.error.message);
+      setPaymentSaving(false);
+      return;
+    }
+    setInvoice((current) =>
+      current ? { ...current, paid, balance, status: nextStatus } : current,
+    );
+    setAmount(0);
+    setPaymentOpen(false);
+    setPaymentSaving(false);
+  };
   if (!invoice)
     return (
-      <AdminShell title="Invoice details" subtitle="Loading invoice data from Supabase.">
+      <AdminShell title="Payment Details" subtitle="Loading payment data from Supabase.">
         <p className="text-sm text-red-600">{loadError || "Loading…"}</p>
       </AdminShell>
     );
   const remaining = Math.max(0, invoice.balance - amount);
   return (
     <AdminShell
-      title="Invoice details"
+      title="Payment Details"
       subtitle="Review financial items, collect payment, and preserve the audit trail."
     >
       <AdminSectionHeading
@@ -104,7 +152,14 @@ function InvoicePage() {
             <Button variant="outline">
               <Printer /> Print invoice
             </Button>
-            <Button onClick={() => setPaymentOpen(true)}>
+            <Button
+              onClick={() => {
+                setPaymentError("");
+                setAmount(invoice.balance);
+                setPaymentOpen(true);
+              }}
+              disabled={invoice.balance <= 0}
+            >
               <Receipt /> Record payment
             </Button>
           </div>
@@ -240,21 +295,24 @@ function InvoicePage() {
             <p className="mt-2 text-xs text-slate-500">
               Remaining after payment: {formatMoney(remaining)}
             </p>
-            <select className="mt-4 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm">
+            <select
+              value={paymentMethod}
+              onChange={(event) => setPaymentMethod(event.target.value)}
+              className="mt-4 h-11 w-full rounded-lg border border-slate-200 px-3 text-sm"
+            >
               <option>Cash</option>
-              <option>Mobile Money</option>
-              <option>Card</option>
-              <option>Bank Transfer</option>
+              <option>Sahal Merchant</option>
             </select>
+            {paymentError ? <p className="mt-3 text-sm text-red-600">{paymentError}</p> : null}
             <div className="mt-5 flex justify-end gap-2">
               <Button variant="outline" onClick={() => setPaymentOpen(false)}>
                 Cancel
               </Button>
               <Button
-                onClick={() => setPaymentOpen(false)}
-                disabled={amount <= 0 || amount > invoice.balance}
+                onClick={() => void recordPayment()}
+                disabled={paymentSaving || amount <= 0 || amount > invoice.balance}
               >
-                <CheckCircle2 /> Confirm payment
+                <CheckCircle2 /> {paymentSaving ? "Recording..." : "Confirm payment"}
               </Button>
             </div>
           </div>

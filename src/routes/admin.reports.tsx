@@ -26,13 +26,7 @@ import {
   YAxis,
 } from "recharts";
 import { AdminSectionHeading, AdminShell } from "@/components/admin/AdminShell";
-import {
-  attentionItems,
-  departmentReport,
-  paymentReport,
-  reportCategories,
-  reportTrend,
-} from "@/content/reports";
+import { reportCategories } from "@/content/reports";
 import { GGH_HOSPITAL_ID } from "@/lib/supabase/hospital";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
@@ -52,6 +46,27 @@ const iconMap = {
   operations: Activity,
   staff: Users,
 };
+type DepartmentReportRow = {
+  department: string;
+  visits: number;
+  consultations: number;
+  revenue: number;
+  wait: number;
+};
+type TrendReportRow = { label: string; visits: number; revenue: number };
+type PaymentReportRow = { name: string; amount: number };
+
+function reportStart(range: string) {
+  const date = new Date();
+  if (range === "Today") date.setHours(0, 0, 0, 0);
+  else if (range === "Last 7 days") date.setDate(date.getDate() - 6);
+  else if (range === "This month") date.setDate(1);
+  else if (range === "This quarter") date.setMonth(Math.floor(date.getMonth() / 3) * 3, 1);
+  else if (range === "This year") date.setMonth(0, 1);
+  else date.setDate(date.getDate() - 29);
+  date.setHours(0, 0, 0, 0);
+  return date.getTime();
+}
 
 function ReportsPage() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -63,60 +78,168 @@ function ReportsPage() {
     comparison: "Previous period",
   });
   const [updated, setUpdated] = useState("2 min ago");
-  const [departmentRows, setDepartmentRows] = useState<typeof departmentReport>([]);
-  const [trendRows, setTrendRows] = useState<typeof reportTrend>([]);
-  const [paymentRows, setPaymentRows] = useState<typeof paymentReport>([]);
+  const [departmentRows, setDepartmentRows] = useState<DepartmentReportRow[]>([]);
+  const [trendRows, setTrendRows] = useState<TrendReportRow[]>([]);
+  const [paymentRows, setPaymentRows] = useState<PaymentReportRow[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<{ id: string; name: string }[]>([]);
+  const [doctorOptions, setDoctorOptions] = useState<{ id: string; name: string }[]>([]);
   const [loadError, setLoadError] = useState("");
   const [reportCounts, setReportCounts] = useState({
     appointments: 0,
     admissions: 0,
     labPending: 0,
   });
+  const [revenueTotal, setRevenueTotal] = useState(0);
+  const [categoryMetrics, setCategoryMetrics] = useState<Record<string, string>>({});
   useEffect(() => {
     let active = true;
     async function loadReports() {
       const client = getSupabaseClient();
-      const [visitsResult, paymentsResult, appointmentsResult, admissionsResult, labOrdersResult] =
-        await Promise.all([
-          client
-            .from("visits")
-            .select("department_id, status, created_at")
-            .eq("hospital_id", GGH_HOSPITAL_ID),
-          client
-            .from("payments")
-            .select("amount, payment_method, received_at")
-            .eq("hospital_id", GGH_HOSPITAL_ID),
-          client.from("appointments").select("id").eq("hospital_id", GGH_HOSPITAL_ID),
-          client.from("admissions").select("id").eq("hospital_id", GGH_HOSPITAL_ID),
-          client.from("lab_orders").select("status").eq("hospital_id", GGH_HOSPITAL_ID),
-        ]);
+      const [
+        visitsResult,
+        paymentsResult,
+        appointmentsResult,
+        admissionsResult,
+        labOrdersResult,
+        departmentsResult,
+        doctorsResult,
+        patientsResult,
+        prescriptionsResult,
+      ] = await Promise.all([
+        client
+          .from("visits")
+          .select("department_id, doctor_id, visit_type, status, created_at")
+          .eq("hospital_id", GGH_HOSPITAL_ID),
+        client
+          .from("payments")
+          .select("amount, payment_method, received_at")
+          .eq("hospital_id", GGH_HOSPITAL_ID),
+        client
+          .from("appointments")
+          .select("id,appointment_at,department_id,doctor_id,visit_type")
+          .eq("hospital_id", GGH_HOSPITAL_ID),
+        client.from("admissions").select("id,created_at").eq("hospital_id", GGH_HOSPITAL_ID),
+        client.from("lab_orders").select("status,requested_at").eq("hospital_id", GGH_HOSPITAL_ID),
+        client
+          .from("departments")
+          .select("id,name")
+          .eq("hospital_id", GGH_HOSPITAL_ID)
+          .eq("active", true)
+          .order("name"),
+        client
+          .from("doctors")
+          .select("id,name")
+          .eq("hospital_id", GGH_HOSPITAL_ID)
+          .eq("active", true)
+          .order("name"),
+        client
+          .from("patients")
+          .select("id,department_id,created_at")
+          .eq("hospital_id", GGH_HOSPITAL_ID),
+        client
+          .from("prescriptions")
+          .select("id,department_id,created_at,status")
+          .eq("hospital_id", GGH_HOSPITAL_ID),
+      ]);
       if (!active) return;
       const error =
         visitsResult.error ??
         paymentsResult.error ??
         appointmentsResult.error ??
         admissionsResult.error ??
-        labOrdersResult.error;
+        labOrdersResult.error ??
+        departmentsResult.error ??
+        doctorsResult.error ??
+        patientsResult.error ??
+        prescriptionsResult.error;
       if (error) {
         setLoadError(error.message);
         return;
       }
+      setDepartmentOptions(departmentsResult.data ?? []);
+      setDoctorOptions(doctorsResult.data ?? []);
+      const departmentMap = new Map(
+        (departmentsResult.data ?? []).map((item) => [item.id, item.name]),
+      );
+      const start = reportStart(filters.range);
+      const within = (date: string) => new Date(date).getTime() >= start;
+      const departmentName = new Map(
+        (departmentsResult.data ?? []).map((item) => [item.id, item.name]),
+      );
+      const doctorName = new Map((doctorsResult.data ?? []).map((item) => [item.id, item.name]));
+      const visitRows = (visitsResult.data ?? []).filter(
+        (row) =>
+          within(row.created_at) &&
+          (filters.department === "All departments" ||
+            departmentName.get(row.department_id ?? "") === filters.department) &&
+          (filters.doctor === "All doctors" ||
+            doctorName.get(row.doctor_id ?? "") === filters.doctor) &&
+          (filters.visitType === "All visit types" || row.visit_type === filters.visitType),
+      );
+      const appointmentRows = (appointmentsResult.data ?? []).filter(
+        (row) =>
+          within(row.appointment_at) &&
+          (filters.department === "All departments" ||
+            departmentName.get(row.department_id ?? "") === filters.department) &&
+          (filters.doctor === "All doctors" ||
+            doctorName.get(row.doctor_id ?? "") === filters.doctor) &&
+          (filters.visitType === "All visit types" || row.visit_type === filters.visitType),
+      );
+      const paymentRowsForPeriod = (paymentsResult.data ?? []).filter((row) =>
+        within(row.received_at),
+      );
+      setRevenueTotal(paymentRowsForPeriod.reduce((sum, row) => sum + Number(row.amount ?? 0), 0));
+      const labRowsForPeriod = (labOrdersResult.data ?? []).filter((row) =>
+        within(row.requested_at),
+      );
+      const patientRowsForPeriod = (patientsResult.data ?? []).filter(
+        (row) =>
+          within(row.created_at) &&
+          (filters.department === "All departments" ||
+            departmentName.get(row.department_id ?? "") === filters.department),
+      );
+      const prescriptionRowsForPeriod = (prescriptionsResult.data ?? []).filter(
+        (row) =>
+          within(row.created_at) &&
+          (filters.department === "All departments" ||
+            departmentName.get(row.department_id ?? "") === filters.department),
+      );
+      setCategoryMetrics({
+        patients: `${patientRowsForPeriod.length.toLocaleString()} patients`,
+        appointments: `${appointmentRows.length.toLocaleString()} appointments`,
+        clinical: `${visitRows.length.toLocaleString()} visits`,
+        laboratory: `${labRowsForPeriod.length.toLocaleString()} lab orders`,
+        pharmacy: `${prescriptionRowsForPeriod.length.toLocaleString()} prescriptions`,
+        billing: `$${paymentRowsForPeriod.reduce((sum, row) => sum + Number(row.amount ?? 0), 0).toLocaleString()} collected`,
+        admissions: `${(admissionsResult.data ?? []).filter((row) => within(row.created_at)).length.toLocaleString()} admissions`,
+        operations: `${visitRows.length.toLocaleString()} operational visits`,
+        staff: `${new Set(visitRows.map((row) => row.doctor_id).filter(Boolean)).size.toLocaleString()} active doctors`,
+      });
       setReportCounts({
-        appointments: appointmentsResult.data?.length ?? 0,
-        admissions: admissionsResult.data?.length ?? 0,
-        labPending: (labOrdersResult.data ?? []).filter((row) =>
+        appointments: appointmentRows.length,
+        admissions: (admissionsResult.data ?? []).filter((row) => within(row.created_at)).length,
+        labPending: labRowsForPeriod.filter((row) =>
           ["Pending", "Ordered", "Processing", "In Progress"].includes(row.status),
         ).length,
       });
       const byDepartment = new Map<string, { visits: number; consultations: number }>();
-      for (const row of visitsResult.data ?? []) {
-        const current = byDepartment.get(row.department_id ?? "Unassigned") ?? {
+      for (const row of visitRows) {
+        const current = byDepartment.get(
+          row.department_id
+            ? (departmentMap.get(row.department_id) ?? "Unknown department")
+            : "Unassigned",
+        ) ?? {
           visits: 0,
           consultations: 0,
         };
         current.visits += 1;
         current.consultations += ["In Consultation", "Completed"].includes(row.status) ? 1 : 0;
-        byDepartment.set(row.department_id ?? "Unassigned", current);
+        byDepartment.set(
+          row.department_id
+            ? (departmentMap.get(row.department_id) ?? "Unknown department")
+            : "Unassigned",
+          current,
+        );
       }
       setDepartmentRows(
         Array.from(byDepartment.entries()).map(([department, value]) => ({
@@ -128,7 +251,7 @@ function ReportsPage() {
         })),
       );
       const byDay = new Map<string, number>();
-      for (const row of visitsResult.data ?? []) {
+      for (const row of visitRows) {
         const day = row.created_at.slice(0, 10);
         byDay.set(day, (byDay.get(day) ?? 0) + 1);
       }
@@ -138,7 +261,7 @@ function ReportsPage() {
           .map(([label, visits]) => ({ label, visits, revenue: 0 })),
       );
       const byMethod = new Map<string, number>();
-      for (const row of paymentsResult.data ?? [])
+      for (const row of paymentRowsForPeriod)
         byMethod.set(
           row.payment_method,
           (byMethod.get(row.payment_method) ?? 0) + Number(row.amount ?? 0),
@@ -149,33 +272,19 @@ function ReportsPage() {
     return () => {
       active = false;
     };
-  }, []);
-  const dataFactor = 1;
+  }, [filters.department, filters.doctor, filters.range, filters.visitType]);
   const filteredDepartments = useMemo(
     () =>
       (filters.department === "All departments"
         ? departmentRows
         : departmentRows.filter((item) => item.department === filters.department)
-      ).map((item) => ({
-        ...item,
-        visits: Math.max(0, Math.round(item.visits * dataFactor)),
-        consultations: Math.max(0, Math.round(item.consultations * dataFactor)),
-        revenue: Math.max(0, Math.round(item.revenue * dataFactor)),
-        wait: Math.max(1, Math.round(item.wait * (filters.visitType === "Emergency" ? 1.3 : 1))),
-      })),
-    [dataFactor, departmentRows, filters.department, filters.visitType],
+      ).map((item) => ({ ...item, wait: Math.max(0, item.wait) })),
+    [departmentRows, filters.department],
   );
-  const filteredTrend = trendRows.map((item) => ({
-    ...item,
-    visits: Math.max(0, Math.round(item.visits * dataFactor)),
-    revenue: Math.max(0, Math.round(item.revenue * dataFactor)),
-  }));
-  const filteredPayments = paymentRows.map((item) => ({
-    ...item,
-    amount: Math.max(0, Math.round(item.amount * dataFactor)),
-  }));
+  const filteredTrend = trendRows;
+  const filteredPayments = paymentRows;
   const totalVisits = filteredDepartments.reduce((sum, row) => sum + row.visits, 0);
-  const totalRevenue = filteredDepartments.reduce((sum, row) => sum + row.revenue, 0);
+  const totalRevenue = revenueTotal;
   const totalConsultations = filteredDepartments.reduce((sum, row) => sum + row.consultations, 0);
   const averageWait = Math.round(
     filteredDepartments.reduce((sum, row) => sum + row.wait, 0) /
@@ -200,6 +309,8 @@ function ReportsPage() {
       <FilterBar
         filters={filters}
         setFilters={setFilters}
+        departmentOptions={departmentOptions.map((item) => item.name)}
+        doctorOptions={doctorOptions.map((item) => item.name)}
         onClear={() =>
           setFilters({
             range: "Last 30 days",
@@ -297,7 +408,7 @@ function ReportsPage() {
             </PieChart>
           </ResponsiveContainer>
           <div className="grid grid-cols-2 gap-2 text-xs">
-            {paymentReport.map((item, index) => (
+            {filteredPayments.map((item, index) => (
               <div key={item.name} className="flex items-center gap-2">
                 <span
                   className="size-2 rounded-full"
@@ -369,7 +480,11 @@ function ReportsPage() {
       <section className="mt-5 rounded-2xl border border-[#f0c987] bg-[#fff9eb] p-5">
         <h3 className="font-display text-lg font-semibold">Needs attention</h3>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
-          {attentionItems.map((item) => (
+          {[
+            `${totalVisits.toLocaleString()} visits are recorded in the selected period.`,
+            `${totalConsultations.toLocaleString()} consultations are marked completed or in consultation.`,
+            `${reportCounts.labPending.toLocaleString()} laboratory orders are currently pending or processing.`,
+          ].map((item) => (
             <div
               key={item}
               className="rounded-xl bg-white/70 p-3 text-xs leading-relaxed text-slate-600"
@@ -410,13 +525,7 @@ function ReportsPage() {
                   {category.description}
                 </p>
                 <p className="mt-4 text-[11px] font-semibold text-[#22577a]">
-                  {category.key === "patients"
-                    ? `${totalVisits.toLocaleString()} filtered visits`
-                    : category.key === "billing"
-                      ? `$${totalRevenue.toLocaleString()} filtered revenue`
-                      : category.key === "clinical"
-                        ? `${totalConsultations.toLocaleString()} filtered consultations`
-                        : `${Math.round(dataFactor * 100)}% of base period selected`}
+                  {categoryMetrics[category.key] ?? "Loading live Supabase data..."}
                 </p>
               </Link>
             );
@@ -431,10 +540,14 @@ function FilterBar({
   filters,
   setFilters,
   onClear,
+  departmentOptions,
+  doctorOptions,
 }: {
   filters: Record<string, string>;
   setFilters: React.Dispatch<React.SetStateAction<typeof filters>>;
   onClear: () => void;
+  departmentOptions: string[];
+  doctorOptions: string[];
 }) {
   return (
     <section className="mb-5 rounded-2xl border border-slate-200 bg-white p-4">
@@ -455,13 +568,13 @@ function FilterBar({
         <Select
           label="Department"
           value={filters.department}
-          options={["All departments", ...departmentReport.map((item) => item.department)]}
+          options={["All departments", ...departmentOptions]}
           onChange={(value) => setFilters((current) => ({ ...current, department: value }))}
         />
         <Select
           label="Doctor"
           value={filters.doctor}
-          options={["All doctors", "Dr. Ahmed Yusuf", "Dr. Hawa Omar", "Dr. Hassan Ismail"]}
+          options={["All doctors", ...doctorOptions]}
           onChange={(value) => setFilters((current) => ({ ...current, doctor: value }))}
         />
         <Select

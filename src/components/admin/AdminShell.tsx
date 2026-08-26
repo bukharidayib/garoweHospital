@@ -6,7 +6,6 @@ import {
   CalendarDays,
   ClipboardList,
   ChevronDown,
-  Clock3,
   FlaskConical,
   LayoutDashboard,
   LogOut,
@@ -30,7 +29,6 @@ const navGroups = [
     items: [
       { label: "Patients", to: "/admin/patients", icon: Users },
       { label: "Appointments", to: "/admin/appointments", icon: CalendarDays },
-      { label: "Queue", to: "/admin/queue", icon: Clock3 },
     ],
   },
   {
@@ -122,11 +120,6 @@ export function AdminShell({
                         className={`size-[18px] ${active ? "text-[#70d2c3]" : "text-white/50"}`}
                       />
                       {label}
-                      {label === "Queue" ? (
-                        <span className="ml-auto rounded-full bg-[#e76f51] px-2 py-0.5 text-[10px] font-bold text-white">
-                          18
-                        </span>
-                      ) : null}
                     </Link>
                   );
                 })}
