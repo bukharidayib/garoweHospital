@@ -1092,18 +1092,6 @@ Then implement the public landing website using reusable components.
 
 The result should look like a premium modern hospital website suitable for Garowe General Hospital, not a generic template.
 
-NB: dont use the lovable.dev icon as Favicon and anywhere.
-
-This project was built with [Lovable](https://lovable.dev).
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/9df37fa0-5444-44e5-bcd0-ad7db54f1450).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
 ## Development
 
 Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
